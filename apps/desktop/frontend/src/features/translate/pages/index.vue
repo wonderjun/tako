@@ -40,9 +40,9 @@
             <DropdownMenuCheckboxItem
               v-for="s in store.enabledServices"
               :key="s.id"
-              :checked="store.selectedIds?.includes(s.id) ?? true"
+              :model-value="store.selectedIds?.includes(s.id) ?? true"
               @select.prevent
-              @update:checked="(v: boolean) => store.toggleSelected(s.id, v)"
+              @update:model-value="(v: boolean) => store.toggleSelected(s.id, v)"
             >
               {{ s.name }}
             </DropdownMenuCheckboxItem>
