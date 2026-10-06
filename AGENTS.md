@@ -61,7 +61,7 @@ docs/spec/                # SPEC-A / SPEC-B 分工规格
    - feat/frontend 只写 `frontend/src/{app,components,features}/**`
    - 主线独占：根配置、`packages/contracts/**`、`main.go`、`internal/bridge/`（实装体可填，注册结构不动）、`frontend/src/shared/desktop/adapter.ts`
 3. **contracts 变更申请制**：分支需要契约变更时在 PR 描述列明字段与理由，主线统一改。
-4. bindings 是生成物（gitignore）：任何 lint/typecheck/build 前保证跑过 `make generate`。
+4. bindings **入库**（`frontend/bindings/`，.ts 形态带类型）：bridge 方法/类型变更后跑 `make generate` 并连同产物一起提交（flags 与 wails3 build 内部一致 `-ts -i`，勿用裸命令生成 .js 造成双态）。
 
 ## 高频红线
 

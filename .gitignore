@@ -52,8 +52,6 @@ apps/desktop/frontend/dist/
 apps/desktop/frontend/.eslintcache
 apps/desktop/frontend/*.tsbuildinfo
 
-# Wails 生成的 bindings（wails3 generate 产物，不入库）
-apps/desktop/frontend/bindings/
 
 # ─────────────────────────────────────────────
 # Go

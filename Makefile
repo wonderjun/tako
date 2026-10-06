@@ -27,20 +27,18 @@ build:
 	cd $(DESKTOP_DIR) && wails3 build
 
 # ------------------------------------------------------------------------------
-# generate: 重新生成 Wails bindings（bridge 方法/类型变更后执行）
+# generate: 重新生成 Wails bindings（bridge 方法/类型变更后执行并提交产物）
+# flags 与 wails3 build 内部一致（-ts -i = TypeScript + interfaces），
+# 生成物为 .ts（带类型）且随仓库入库。
 # ------------------------------------------------------------------------------
 generate:
-	cd $(DESKTOP_DIR) && wails3 generate bindings
-
-# bindings 是 gitignore 的生成物：lint/typecheck/build 都依赖它存在，
-# 所有入口先跑一次幂等生成（需 Go + wails3 CLI）。
-generate-bindings:
-	cd $(DESKTOP_DIR) && wails3 generate bindings
+	cd $(DESKTOP_DIR) && wails3 generate bindings -ts -i -clean=true
 
 # ------------------------------------------------------------------------------
 # ci: 全部本地 CI 检查（push 前必跑）
+# bindings 已入库，无需先生成
 # ------------------------------------------------------------------------------
-ci: generate-bindings ci-frontend ci-go
+ci: ci-frontend ci-go
 
 # ------------------------------------------------------------------------------
 # ci-frontend: 前端 install + lint + 类型检查 + 测试

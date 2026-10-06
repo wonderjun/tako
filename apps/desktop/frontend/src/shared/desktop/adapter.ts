@@ -42,10 +42,10 @@ type BindingsModule = Record<string, (...args: unknown[]) => Promise<unknown>>;
 
 async function createWailsBridge(): Promise<DesktopBridge> {
   const [svcRaw, rt] = await Promise.all([
-    // bindings 是 wails3 generate 的 js 产物（gitignore，make ci/dev 前置生成），
-    // 无 .d.ts，运行时形态由 BindingsModule 约束
-    // @ts-expect-error TS7016/TS2307: 生成物无类型声明
-    import('../../../bindings/tako/internal/bridge/service.js'),
+    // bindings 是 wails3 生成物（gitignore）。注意两种形态：
+    // `wails3 generate bindings` 产出 .js（无类型，由 bindings-shim.d.ts 兜底），
+    // `wails3 build` 内部产出 .ts（带真类型）。import 不带扩展名以同时命中两者。
+    import('../../../bindings/tako/internal/bridge/service'),
     import('@wailsio/runtime'),
   ]);
   const svc = svcRaw as unknown as BindingsModule;
