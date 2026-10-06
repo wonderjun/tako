@@ -11,14 +11,14 @@ import (
 
 // fakeBackend 脚本化假后端：记录调用、可控 changeCount/文本/错误。
 type fakeBackend struct {
-	count       int64
-	text        string
-	snapCalls   int
+	count        int64
+	text         string
+	snapCalls    int
 	restoreCalls int
-	copyCalls   int
-	copyErr     error
-	readErr     error
-	snapErr     error
+	copyCalls    int
+	copyErr      error
+	readErr      error
+	snapErr      error
 	// copyHook 模拟复制时的副作用（如 bump count 表示剪贴板被改写）。
 	copyHook func(*fakeBackend)
 }
@@ -49,7 +49,7 @@ func (f *fakeBackend) SimulateCopy() error {
 
 func TestCapture_Success(t *testing.T) {
 	fb := &fakeBackend{
-		text: "选中文本",
+		text:     "选中文本",
 		copyHook: func(f *fakeBackend) { f.count++ },
 	}
 	got, err := capture(context.Background(), fb)

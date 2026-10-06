@@ -1,7 +1,9 @@
 //go:build smoke
 
 // 真实 API 冒烟测试（可选，默认不跑）：
-//   go test -tags smoke ./internal/provider/ -run Smoke -v
+//
+//	go test -tags smoke ./internal/provider/ -run Smoke -v
+//
 // DeepL 需环境变量 TAKO_SMOKE_DEEPL_KEY；google/microsoft 免 key。
 package provider
 

@@ -31,10 +31,10 @@ type keybdInput struct {
 }
 
 type input struct {
-	typ  uint32
-	_    uint32 // union 对齐 padding
-	ki   keybdInput
-	_    [8]byte // union 剩余（32 - sizeof(keybdInput)=24）
+	typ uint32
+	_   uint32 // union 对齐 padding
+	ki  keybdInput
+	_   [8]byte // union 剩余（32 - sizeof(keybdInput)=24）
 }
 
 var procSendInput = windows.NewLazySystemDLL("user32.dll").NewProc("SendInput")
