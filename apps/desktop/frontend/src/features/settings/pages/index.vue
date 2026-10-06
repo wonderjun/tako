@@ -138,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -182,6 +182,15 @@ const license = ref<LicenseInfo | null>(null);
 /** 正在录制的快捷键字段. */
 const recording = ref<null | 'selectionTranslate' | 'inputTranslate'>(null);
 
+// 任一设置变更即写回（主题切换即时生效依赖 settings store 的副作用）
+watch(
+  draft,
+  () => {
+    void persist();
+  },
+  { deep: true },
+);
+
 onMounted(async () => {
   try {
     await settingsStore.load();
@@ -219,6 +228,5 @@ function onRecordKeydown(e: KeyboardEvent): void {
   if (!hotkey) return;
   draft.hotkeys[recording.value] = hotkey;
   recording.value = null;
-  void persist();
 }
 </script>

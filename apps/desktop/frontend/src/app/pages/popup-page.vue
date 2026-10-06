@@ -2,40 +2,42 @@
   <!-- 透明窗口内的卡片本体 -->
   <div class="min-h-screen bg-transparent p-3">
     <div class="flex min-h-0 flex-col gap-3 rounded-xl border bg-card p-4 text-card-foreground shadow-lg">
-      <!-- 顶部：服务切换 + 操作 -->
+      <!-- 顶部：服务切换 + 操作（窄窗下 Segmented 可收缩滚动，操作按钮恒可见） -->
       <div class="flex items-center gap-2">
         <Segmented
           v-if="segmentItems.length > 1"
           :model-value="activeServiceId"
           :items="segmentItems"
+          class="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none]"
           @update:model-value="(v: string) => (activeServiceId = v)"
         />
         <span v-else-if="segmentItems.length === 1" class="truncate text-sm font-medium">
           {{ segmentItems[0]?.label }}
         </span>
-        <div class="flex-1" />
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          aria-label="复制译文"
-          title="复制译文"
-          :disabled="!currentText"
-          @click="copyResult"
-        >
-          <Copy :size="14" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          :aria-label="pinned ? '取消钉住' : '钉住'"
-          :title="pinned ? '取消钉住' : '钉住'"
-          @click="pinned = !pinned"
-        >
-          <Pin :size="14" :class="pinned ? 'fill-current' : ''" />
-        </Button>
-        <Button variant="ghost" size="icon-xs" aria-label="关闭" title="关闭" @click="onClose">
-          <X :size="14" />
-        </Button>
+        <div class="flex shrink-0 items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            aria-label="复制译文"
+            title="复制译文"
+            :disabled="!currentText"
+            @click="copyResult"
+          >
+            <Copy :size="14" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            :aria-label="pinned ? '取消钉住' : '钉住'"
+            :title="pinned ? '取消钉住' : '钉住'"
+            @click="pinned = !pinned"
+          >
+            <Pin :size="14" :class="pinned ? 'fill-current' : ''" />
+          </Button>
+          <Button variant="ghost" size="icon-xs" aria-label="关闭" title="关闭" @click="onClose">
+            <X :size="14" />
+          </Button>
+        </div>
       </div>
 
       <!-- 译文区（复用 B3 的流式渲染） -->
@@ -71,8 +73,10 @@ const pinned = ref(false);
 /** selection:captured 订阅的取消函数. */
 let unsubscribe: (() => void) | null = null;
 
-/** 服务切换项（标签 = 服务名）. */
-const segmentItems = computed(() => store.activeServices.map((s) => ({ value: s.id, label: s.name })));
+/** 服务切换项（标签 = 服务名，窄窗下超长截断）. */
+const segmentItems = computed(() =>
+  store.activeServices.map((s) => ({ value: s.id, label: s.name.length > 12 ? `${s.name.slice(0, 12)}…` : s.name })),
+);
 
 /** 当前服务的译文文本. */
 const currentText = computed(() => store.streams.get(activeServiceId.value)?.text ?? '');

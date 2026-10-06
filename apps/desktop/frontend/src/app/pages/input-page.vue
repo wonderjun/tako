@@ -12,7 +12,7 @@
         @keydown="onKeydown"
       />
       <Select v-model="store.sourceLang">
-        <SelectTrigger size="sm" class="w-24" aria-label="源语言">
+        <SelectTrigger size="sm" class="w-28" aria-label="源语言">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -21,7 +21,7 @@
       </Select>
       <ArrowRight :size="14" class="shrink-0 text-muted-foreground" aria-hidden="true" />
       <Select v-model="store.targetLang">
-        <SelectTrigger size="sm" class="w-24" aria-label="目标语言">
+        <SelectTrigger size="sm" class="w-28" aria-label="目标语言">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

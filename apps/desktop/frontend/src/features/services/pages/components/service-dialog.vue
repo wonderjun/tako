@@ -114,6 +114,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
 import { toast } from 'vue-sonner';
 import { Check, CircleAlert } from '@lucide/vue';
@@ -185,8 +186,9 @@ const initialValues = computed(() => ({
   authScheme: props.service?.authScheme ?? ('bearer' as 'bearer' | 'x-api-key'),
 }));
 
-const { handleSubmit, values, isSubmitting, resetForm } = useForm<ServiceFormValues>({
-  validationSchema: schema,
+const { handleSubmit, values, isSubmitting, resetForm } = useForm({
+  // 裸 zod schema 不被 vee-validate 识别（校验静默失效），必须经 toTypedSchema 适配
+  validationSchema: toTypedSchema(schema),
   initialValues: initialValues.value,
 });
 
