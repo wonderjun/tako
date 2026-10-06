@@ -1,11 +1,8 @@
 <template>
-  <main class="mx-auto flex w-full max-w-4xl flex-col gap-4 p-6">
-    <!-- 页头 -->
+  <main class="mx-auto flex w-full max-w-4xl flex-col gap-4 px-6 pb-6 pt-1">
+    <!-- 页头（标题在壳层标题栏，见 app-shell + route.meta.title） -->
     <header class="flex items-center justify-between">
-      <div>
-        <h1 class="text-lg font-semibold">翻译服务</h1>
-        <p class="text-body text-muted-foreground">管理多开对照的翻译服务，启用的服务参与翻译。</p>
-      </div>
+      <p class="text-body text-muted-foreground">管理多开对照的翻译服务，启用的服务参与翻译。</p>
       <Button @click="openCreate()">
         <Plus :size="16" />
         添加服务

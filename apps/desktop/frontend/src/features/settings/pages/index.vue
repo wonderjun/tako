@@ -1,7 +1,6 @@
 <template>
-  <main class="mx-auto flex w-full max-w-3xl flex-col gap-4 p-6">
+  <main class="mx-auto flex w-full max-w-3xl flex-col gap-4 px-6 pb-6 pt-1">
     <header>
-      <h1 class="text-lg font-semibold">设置</h1>
       <p class="text-body text-muted-foreground">语言、快捷键、外观与授权信息。</p>
     </header>
 

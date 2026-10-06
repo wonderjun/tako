@@ -45,6 +45,7 @@ func main() {
 		MaxWidth:  1100,
 		URL:       "/#/",
 		Mac: application.MacWindow{
+			// 前端 app-shell.vue 顶部按此值预留 50px 拖拽区，改动需同步
 			InvisibleTitleBarHeight: 50,
 			Backdrop:                application.MacBackdropTranslucent,
 			TitleBar:                application.MacTitleBarHiddenInset,

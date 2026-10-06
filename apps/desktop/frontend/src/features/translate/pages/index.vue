@@ -1,5 +1,5 @@
 <template>
-  <main class="mx-auto flex h-full w-full max-w-3xl flex-col gap-4 p-6">
+  <main class="mx-auto flex h-full w-full max-w-3xl flex-col gap-4 px-6 pb-6 pt-1">
     <!-- 输入区 -->
     <section class="flex flex-col gap-2">
       <Textarea

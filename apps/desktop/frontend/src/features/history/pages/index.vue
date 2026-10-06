@@ -1,11 +1,8 @@
 <template>
-  <main class="mx-auto flex h-full w-full max-w-4xl flex-col gap-4 p-6">
-    <!-- 页头 -->
+  <main class="mx-auto flex h-full w-full max-w-4xl flex-col gap-4 px-6 pb-6 pt-1">
+    <!-- 页头（标题在壳层标题栏，见 app-shell + route.meta.title） -->
     <header class="flex items-center justify-between">
-      <div>
-        <h1 class="text-lg font-semibold">历史</h1>
-        <p class="text-body text-muted-foreground">共 {{ store.total }} 条翻译记录。</p>
-      </div>
+      <p class="text-body text-muted-foreground">共 {{ store.total }} 条翻译记录。</p>
     </header>
 
     <!-- 过滤条 -->
