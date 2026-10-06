@@ -2,14 +2,16 @@
  * keydown 事件 → 快捷键串（如 'Alt+D'）.
  *
  * 纯修饰键（Alt/Ctrl/Shift/Cmd 等单独按下）返回 null，等待完整组合；
- * 修饰键展示序固定为 Ctrl → Alt → Shift → Cmd；单字符统一大写，
- * Space/功能键/方向键保留语义名。
+ * 修饰键展示序固定为 Ctrl → Alt → Shift → Cmd；字母/数字取物理键（e.code），
+ * 避免 macOS Option 组合产出死键字符（Option+S='ß'，toUpperCase 会膨胀成 'SS'）；
+ * Space/功能键/方向键保留语义名.
  *
  * @param e 键盘事件形状（注入便于测试，无需真实 KeyboardEvent）.
  * @returns 规范化快捷键串；不可用的键返回 null.
  */
 export interface HotkeyEventLike {
   key: string;
+  code: string;
   altKey: boolean;
   ctrlKey: boolean;
   metaKey: boolean;
@@ -26,13 +28,25 @@ export function formatHotkey(e: HotkeyEventLike): string | null {
   if (e.altKey) parts.push('Alt');
   if (e.shiftKey) parts.push('Shift');
   if (e.metaKey) parts.push('Cmd');
-  parts.push(normalizeKey(e.key));
+  parts.push(normalizeKey(e.key, e.code));
   return parts.join('+');
 }
 
-/** 键名规范化：空格 → Space，单字符统一大写，其余保留原名. */
-function normalizeKey(key: string): string {
+/**
+ * 键名规范化：字母/数字优先取物理键 code（KeyS→S、Digit1→1），
+ * 避开 Option 死键产物；其余取语义键名（空格 → Space，F2/ArrowLeft 等保留）.
+ */
+function normalizeKey(key: string, code: string): string {
+  const physical = physicalKey(code);
+  if (physical) return physical;
   if (key === ' ') return 'Space';
   if (key.length === 1) return key.toUpperCase();
   return key;
+}
+
+/** code（物理键）→ 键名；仅映射字母/数字行，其余返回 null 走语义名. */
+function physicalKey(code: string): string | null {
+  if (/^Key([A-Z])$/.test(code)) return code.slice(3);
+  if (/^Digit([0-9])$/.test(code)) return code.slice(5);
+  return null;
 }

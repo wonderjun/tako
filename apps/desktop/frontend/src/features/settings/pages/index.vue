@@ -1,5 +1,5 @@
 <template>
-  <main class="mx-auto flex w-full max-w-2xl flex-col gap-4 p-6" @keydown.capture="onRecordKeydown">
+  <main class="mx-auto flex w-full max-w-3xl flex-col gap-4 p-6">
     <header>
       <h1 class="text-lg font-semibold">设置</h1>
       <p class="text-body text-muted-foreground">语言、快捷键、外观与授权信息。</p>
@@ -139,6 +139,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue';
+import { useEventListener } from '@vueuse/core';
 import { toast } from 'vue-sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -215,18 +216,27 @@ function startRecording(field: 'selectionTranslate' | 'inputTranslate'): void {
   recording.value = field;
 }
 
-/** 录制捕获（capture 阶段拦截）：Esc 取消，纯修饰键忽略，有效组合写回. */
-function onRecordKeydown(e: KeyboardEvent): void {
-  if (recording.value === null) return;
-  e.preventDefault();
-  e.stopPropagation();
-  if (e.key === 'Escape') {
+/**
+ * 录制捕获（window capture）：Esc 取消，纯修饰键忽略，有效组合写回.
+ * 挂 window 而非 <main>——录制按钮 disabled 后焦点可能落在 body，
+ * target=body 的 keydown 不经过 main 子树（曾致"按键没反应"）.
+ */
+useEventListener(
+  window,
+  'keydown',
+  (e: KeyboardEvent) => {
+    if (recording.value === null) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.key === 'Escape') {
+      recording.value = null;
+      return;
+    }
+    const hotkey = formatHotkey(e);
+    if (!hotkey) return;
+    draft.hotkeys[recording.value] = hotkey;
     recording.value = null;
-    return;
-  }
-  const hotkey = formatHotkey(e);
-  if (!hotkey) return;
-  draft.hotkeys[recording.value] = hotkey;
-  recording.value = null;
-}
+  },
+  { capture: true },
+);
 </script>

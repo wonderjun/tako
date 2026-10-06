@@ -1,5 +1,5 @@
 <template>
-  <main class="mx-auto flex w-full max-w-3xl flex-col gap-4 p-6">
+  <main class="mx-auto flex w-full max-w-4xl flex-col gap-4 p-6">
     <!-- 页头 -->
     <header class="flex items-center justify-between">
       <div>
