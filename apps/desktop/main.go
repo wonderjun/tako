@@ -115,8 +115,9 @@ func main() {
 		app.Quit()
 	})
 	tray.SetMenu(trayMenu)
-	// 托盘图标左键点击 = 显示主窗口（菜单从右键/长按出）
-	tray.OnClick(func() { mainWindow.Show() })
+	// 注意：不设 tray.OnClick——wails3 在 clickHandler 为空时左键原生弹出菜单
+	// （带高亮、不激活 app），对标 Bob 的点图标即弹菜单。主窗口入口走菜单第一项
+	// 与 Dock 图标。
 
 	if err := app.Run(); err != nil {
 		log.Fatal(err)
