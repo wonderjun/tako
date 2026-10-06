@@ -59,14 +59,17 @@ ID 生成用 `nanoid`（`github.com/matoous/go-nanoid/v2`）或等价。
 
 ### A5 bridge 实装
 
-`internal/bridge/service.go` 的 stub 换成真实现：
-- 构造注入：store、provider 注册表、license（`NewService(store, ...)`，main.go 装配改一行——**如需动 main.go，PR 里说明，主线合**）
-- `Translate`：生成 requestId → 存 `map[requestID]cancelFunc` → 每服务 goroutine fan-out → emit 用 `application.Get().EmitEvent(BridgeEvents.translateEvent, ev)`（事件名常量在 Go 侧镜像 contracts 的 `BridgeEvents`）；全部终态后清 map
-- `CancelTranslate`：调 cancelFunc（provider ctx 取消 → emit error(code=cancelled)）
-- `ServiceStartup` 里初始化 store；`ServiceShutdown` 关闭
+`internal/bridge/service.go` 的 stub 换成真实现。**依赖装配走生命周期钩子，`NewService()` 保持无参、main.go 零改动**（main.go 是主线独占，feat/backend 分支不触碰）：
+
+- `ServiceStartup(ctx, options)`（钩子签名已留在 stub）：打开 store（`os.UserConfigDir()/Tako/tako.db`）→ 建 provider 注册表（map[type]Provider 构造器）→ 初始化 `active map[requestID]context.CancelFunc`。装配失败返回 error 让应用启动即败露
+- `ServiceShutdown()`：关 store、cancel 全部在途请求
+- `Translate`：生成 requestId → 存 cancelFunc → 每服务 goroutine fan-out → emit 用 `application.Get().Event.Emit("translate:event", ev)`（`application.Get()` 是全局单例，ServiceStartup 后即可用；事件名与 payload 镜像 contracts 的 `BridgeEvents`/`StreamEvent`）；全部终态后清 map 条目
+- `CancelTranslate`：调 cancelFunc（provider ctx 取消 → 该服务 emit error(code=cancelled)）
 - 事件结构体直接用 `provider.StreamEvent`（字段已对齐 contracts）
 
-验收：`wails3 dev`（主线环境）前端真实调用全链路；与主线约 I1 联调。
+若确实需要 main.go 配合（例如未来加托盘/快捷键服务注册），在 PR 描述里列「main.go 变更申请」，主线代改——不要在 feat/backend 分支提交 main.go。
+
+验收：`go build ./...` 通过 + 生命周期/store 单测；`wails3 dev`（主线环境）前端真实调用全链路；与主线约 I1 联调。
 
 ## 时序与依赖
 

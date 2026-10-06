@@ -1,27 +1,33 @@
-// BridgeService 是 Wails 暴露给前端的唯一服务：方法名与参数结构对齐
+// Service 是 Wails 暴露给前端的唯一服务：方法名与参数结构对齐
 // packages/contracts 的 BridgeMethods（P0 全 stub，A5 实装）。
 //
-// 实装注记（A5）：
-//   - Translate：fan-out 到 provider，StreamEvent 经 app 事件
-//     translate:event 推送（requestId+serviceId 聚合）
-//   - CancelTranslate：维护 map[requestID]context.CancelFunc
-//   - List/Save/Delete*：接 internal/store
-//   - CheckAccessibility：接 internal/selection 的权限检测
+// 依赖装配约定（A5，见 docs/spec/SPEC-A.md）：
+// NewService() 保持无参（main.go 主线独占、永不因后端改动而变）；
+// store / provider 注册表 / active map 全部在 ServiceStartup 钩子内装配，
+// ServiceShutdown 释放。事件推送用 application.Get().Event.Emit。
 package bridge
 
 import (
 	"context"
 	"fmt"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-// Service bridge 服务实例。依赖在 A5 实装时注入（store、provider 注册表、
-// license），P0 保持零依赖。
+// Service bridge 服务实例。依赖（store、provider 注册表、active map）
+// 在 ServiceStartup 内装配，P0 保持零依赖。
 type Service struct{}
 
-// NewService 构造 bridge 服务。
+// NewService 构造 bridge 服务（无参：main.go 装配行恒定不变）。
 func NewService() *Service { return &Service{} }
 
-// ServiceShutdown 实现 Wails 生命周期（预留：A5 在此释放 store 等资源）。
+// ServiceStartup Wails 生命周期钩子：A5 在此装配 store/provider 注册表/
+// active map（打开 SQLite、建 map[type]构造器）。返回 error 则应用启动即败露。
+func (s *Service) ServiceStartup(ctx context.Context, options application.ServiceOptions) error {
+	return nil
+}
+
+// ServiceShutdown Wails 生命周期钩子：A5 在此关 store、cancel 在途请求。
 func (s *Service) ServiceShutdown() {}
 
 // Ping 链路验证，返回 pong 标识。
