@@ -55,8 +55,12 @@ async function createWailsBridge(): Promise<DesktopBridge> {
     ['selectionCaptured', BridgeEvents.selectionCaptured],
     ['hotkeyTriggered', BridgeEvents.hotkeyTriggered],
   ] as const) {
-    rt.Events.On(key, (data: unknown) => {
-      bridgeEvents.emit(name, data as never);
+    rt.Events.On(key, (event: unknown) => {
+      // CUSTOMIZED(hotfix): wails3 的 Events.On 回调收到的是 WailsEvent 包装（{name, data}），
+      // 剥离后才是业务 payload —— 否则下游按 StreamEvent 字段取值全为 undefined，
+      // 事件被 (requestId, serviceId) 聚合过滤全部丢弃（真机表现为流式翻译永远"输出中"）。
+      const payload = event instanceof rt.Events.WailsEvent ? event.data : event;
+      bridgeEvents.emit(name, payload as never);
     });
   }
 
