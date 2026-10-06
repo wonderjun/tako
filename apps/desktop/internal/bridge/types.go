@@ -75,12 +75,12 @@ type HotkeyConfig struct {
 }
 
 type AppSettings struct {
-	SourceLang     string       `json:"sourceLang"`
-	TargetLang     string       `json:"targetLang"`
-	Hotkeys        HotkeyConfig `json:"hotkeys"`
-	Theme          string       `json:"theme"` // light | dark | system
-	LaunchAtLogin  bool         `json:"launchAtLogin"`
-	MaxConcurrent  int          `json:"maxConcurrent"`
+	SourceLang    string       `json:"sourceLang"`
+	TargetLang    string       `json:"targetLang"`
+	Hotkeys       HotkeyConfig `json:"hotkeys"`
+	Theme         string       `json:"theme"` // light | dark | system
+	LaunchAtLogin bool         `json:"launchAtLogin"`
+	MaxConcurrent int          `json:"maxConcurrent"`
 }
 
 // LicenseInfo 许可证状态（contracts.LicenseInfo）。
