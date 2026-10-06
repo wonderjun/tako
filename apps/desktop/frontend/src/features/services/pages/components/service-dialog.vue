@@ -38,15 +38,21 @@
             </FormItem>
           </FormField>
 
-          <!-- llm 专用字段（v-show 保持挂载，切换类型不丢已填值） -->
-          <div v-show="values.type === 'llm'" class="grid gap-4">
+          <!-- llm/deepl 共用字段（v-show 保持挂载，切换类型不丢已填值） -->
+          <div v-show="values.type === 'llm' || values.type === 'deepl'" class="grid gap-4">
             <FormField v-slot="{ componentField }" name="baseUrl">
               <FormItem>
                 <FormLabel>Base URL</FormLabel>
                 <FormControl>
-                  <Input v-bind="componentField" placeholder="如 api.example.com/v1" />
+                  <Input
+                    v-bind="componentField"
+                    :placeholder="values.type === 'deepl' ? '可留空' : '如 api.example.com/v1'"
+                  />
                 </FormControl>
-                <FormDescription
+                <FormDescription v-if="values.type === 'deepl'"
+                  >可留空（默认 DeepL Free 端点）；Pro 账户填 https://api.deepl.com。</FormDescription
+                >
+                <FormDescription v-else
                   >填到根路径为止（如 https://api.siliconflow.cn/v1），不要带 /chat/completions
                   后缀，后端会自动拼接。</FormDescription
                 >
@@ -58,12 +64,19 @@
               <FormItem>
                 <FormLabel>API Key</FormLabel>
                 <FormControl>
-                  <Input v-bind="componentField" type="password" placeholder="sk-..." />
+                  <Input
+                    v-bind="componentField"
+                    type="password"
+                    :placeholder="values.type === 'deepl' ? 'DeepL Auth Key' : 'sk-...'"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             </FormField>
+          </div>
 
+          <!-- llm 专用字段 -->
+          <div v-show="values.type === 'llm'" class="grid gap-4">
             <FormField v-slot="{ componentField }" name="model">
               <FormItem>
                 <FormLabel>模型</FormLabel>
@@ -178,6 +191,9 @@ const schema = z
     if (val.type === 'llm' && !val.baseUrl.trim()) {
       ctx.addIssue({ code: 'custom', message: 'llm 服务需填写 Base URL', path: ['baseUrl'] });
     }
+    if (val.type === 'deepl' && !val.apiKey.trim()) {
+      ctx.addIssue({ code: 'custom', message: 'deepl 服务需填写 API Key', path: ['apiKey'] });
+    }
   });
 
 type ServiceFormValues = z.infer<typeof schema>;
@@ -223,6 +239,14 @@ function buildDraft(values: ServiceFormValues): ServiceDraft {
     enabled: props.service?.enabled ?? true,
     order: props.service?.order,
   };
+  // deepl 需要 apiKey（必填校验）；baseUrl 可留空走 Free 端点
+  if (values.type === 'deepl') {
+    return {
+      ...base,
+      baseUrl: values.baseUrl.trim() || undefined,
+      apiKey: values.apiKey.trim() || undefined,
+    };
+  }
   if (values.type !== 'llm') return base;
   return {
     ...base,
