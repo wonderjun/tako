@@ -27,6 +27,27 @@
             <SelectItem v-for="l in TARGET_LANGUAGES" :key="l.code" :value="l.code">{{ l.label }}</SelectItem>
           </SelectContent>
         </Select>
+        <!-- 对照渠道多选（勾选后菜单保持打开，便于连续调整） -->
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Button variant="outline" size="sm" aria-label="选择对照渠道">
+              <Layers :size="14" />
+              渠道 {{ store.activeServices.length }}/{{ store.enabledServices.length }}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" class="w-56">
+            <DropdownMenuLabel>对照渠道</DropdownMenuLabel>
+            <DropdownMenuCheckboxItem
+              v-for="s in store.enabledServices"
+              :key="s.id"
+              :checked="store.selectedIds?.includes(s.id) ?? true"
+              @select.prevent
+              @update:checked="(v: boolean) => store.toggleSelected(s.id, v)"
+            >
+              {{ s.name }}
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <div class="flex-1" />
         <Button variant="ghost" :disabled="store.isTranslating" @click="store.reset()">清空</Button>
         <Button v-if="store.isTranslating" variant="outline" @click="store.cancel()">取消</Button>
@@ -75,9 +96,16 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { ArrowRight } from '@lucide/vue';
+import { ArrowRight, Layers } from '@lucide/vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';

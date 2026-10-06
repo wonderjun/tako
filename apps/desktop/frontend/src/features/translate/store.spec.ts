@@ -81,6 +81,28 @@ describe('useTranslateStore（mock 桥驱动）', () => {
     }
   });
 
+  it('toggleSelected 收窄对照渠道并同步移除旧子流', async () => {
+    const store = useTranslateStore();
+    await store.loadServices();
+    expect(store.activeServices.length).toBe(store.enabledServices.length);
+
+    const target = store.enabledServices[1]!;
+    store.input = 'channel case';
+    await store.translate();
+    await flushStream();
+
+    // 关掉第二个渠道：activeServices 收窄，其子流被移除
+    store.toggleSelected(target.id, false);
+    expect(store.selectedIds).not.toContain(target.id);
+    expect(store.activeServices.some((s) => s.id === target.id)).toBe(false);
+    expect(store.streams.has(target.id)).toBe(false);
+
+    // 重新勾回：null 化之前的选择集合包含它
+    store.toggleSelected(target.id, true);
+    expect(store.selectedIds).toContain(target.id);
+    expect(store.activeServices.length).toBe(store.enabledServices.length);
+  });
+
   it('cancel 后非终态子流归 idle 且迟到事件被 requestId 过滤', async () => {
     const store = useTranslateStore();
     await store.loadServices();

@@ -1,112 +1,120 @@
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="max-w-lg">
+    <!-- flex 列 + DialogBody 滚动：llm 字段多时 footer 恒在可视区，正文内部滚动 -->
+    <DialogContent class="flex flex-col">
       <DialogHeader>
         <DialogTitle>{{ isEdit ? '编辑服务' : '添加服务' }}</DialogTitle>
         <DialogDescription>配置翻译服务的连接信息；llm 类型走 OpenAI 兼容协议并支持流式对照。</DialogDescription>
       </DialogHeader>
 
-      <form class="grid gap-4" novalidate @submit="submit">
-        <!-- 公共字段：名称 -->
-        <FormField v-slot="{ componentField }" name="name">
-          <FormItem>
-            <FormLabel>名称</FormLabel>
-            <FormControl>
-              <Input v-bind="componentField" placeholder="例如 My OpenAI" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <!-- 公共字段：类型 -->
-        <FormField v-slot="{ componentField }" name="type">
-          <FormItem>
-            <FormLabel>类型</FormLabel>
-            <Select v-bind="componentField">
-              <FormControl>
-                <SelectTrigger class="w-full">
-                  <SelectValue placeholder="选择类型" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem v-for="t in TYPE_OPTIONS" :key="t.value" :value="t.value">{{ t.label }}</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <!-- llm 专用字段（v-show 保持挂载，切换类型不丢已填值） -->
-        <div v-show="values.type === 'llm'" class="grid gap-4">
-          <FormField v-slot="{ componentField }" name="baseUrl">
+      <DialogBody>
+        <form id="service-form" class="grid gap-4" novalidate @submit="submit">
+          <!-- 公共字段：名称 -->
+          <FormField v-slot="{ componentField }" name="name">
             <FormItem>
-              <FormLabel>Base URL</FormLabel>
+              <FormLabel>名称</FormLabel>
               <FormControl>
-                <Input v-bind="componentField" placeholder="如 api.example.com/v1" />
+                <Input v-bind="componentField" placeholder="例如 My OpenAI" />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="apiKey">
+          <!-- 公共字段：类型 -->
+          <FormField v-slot="{ componentField }" name="type">
             <FormItem>
-              <FormLabel>API Key</FormLabel>
-              <FormControl>
-                <Input v-bind="componentField" type="password" placeholder="sk-..." />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-
-          <FormField v-slot="{ componentField }" name="model">
-            <FormItem>
-              <FormLabel>模型</FormLabel>
-              <FormControl>
-                <Input v-bind="componentField" placeholder="例如 gpt-4o-mini" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-
-          <FormField v-slot="{ componentField }" name="authScheme">
-            <FormItem>
-              <FormLabel>鉴权方式</FormLabel>
+              <FormLabel>类型</FormLabel>
               <Select v-bind="componentField">
                 <FormControl>
                   <SelectTrigger class="w-full">
-                    <SelectValue placeholder="选择鉴权方式" />
+                    <SelectValue placeholder="选择类型" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="bearer">Bearer Token（Authorization 头）</SelectItem>
-                  <SelectItem value="x-api-key">x-api-key 头</SelectItem>
+                  <SelectItem v-for="t in TYPE_OPTIONS" :key="t.value" :value="t.value">{{ t.label }}</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
             </FormItem>
           </FormField>
-        </div>
 
-        <!-- 连通性测试结果 -->
-        <Alert v-if="testResult?.ok" variant="success">
-          <Check />
-          <AlertTitle>连通正常 · {{ testResult.latencyMs }}ms</AlertTitle>
-          <AlertDescription>样例译文：{{ testResult.sample }}</AlertDescription>
-        </Alert>
-        <Alert v-else-if="testResult" variant="destructive">
-          <CircleAlert />
-          <AlertTitle>测试失败</AlertTitle>
-          <AlertDescription>{{ testResult.error ?? '未知错误' }}</AlertDescription>
-        </Alert>
+          <!-- llm 专用字段（v-show 保持挂载，切换类型不丢已填值） -->
+          <div v-show="values.type === 'llm'" class="grid gap-4">
+            <FormField v-slot="{ componentField }" name="baseUrl">
+              <FormItem>
+                <FormLabel>Base URL</FormLabel>
+                <FormControl>
+                  <Input v-bind="componentField" placeholder="如 api.example.com/v1" />
+                </FormControl>
+                <FormDescription
+                  >填到根路径为止（如 https://api.siliconflow.cn/v1），不要带 /chat/completions
+                  后缀，后端会自动拼接。</FormDescription
+                >
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <DialogFooter>
-          <Button type="button" variant="outline" :disabled="isTesting" @click="runTest()">
-            <Spinner v-if="isTesting" class="size-3.5" />
-            测试
-          </Button>
-          <Button type="submit" :disabled="isSubmitting">保存</Button>
-        </DialogFooter>
-      </form>
+            <FormField v-slot="{ componentField }" name="apiKey">
+              <FormItem>
+                <FormLabel>API Key</FormLabel>
+                <FormControl>
+                  <Input v-bind="componentField" type="password" placeholder="sk-..." />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+
+            <FormField v-slot="{ componentField }" name="model">
+              <FormItem>
+                <FormLabel>模型</FormLabel>
+                <FormControl>
+                  <Input v-bind="componentField" placeholder="例如 gpt-4o-mini" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+
+            <FormField v-slot="{ componentField }" name="authScheme">
+              <FormItem>
+                <FormLabel>鉴权方式</FormLabel>
+                <Select v-bind="componentField">
+                  <FormControl>
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="选择鉴权方式" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="bearer">Bearer Token（Authorization 头）</SelectItem>
+                    <SelectItem value="x-api-key">x-api-key 头</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+
+          <!-- 连通性测试结果 -->
+          <Alert v-if="testResult?.ok" variant="success">
+            <Check />
+            <AlertTitle>连通正常 · {{ testResult.latencyMs }}ms</AlertTitle>
+            <AlertDescription>样例译文：{{ testResult.sample }}</AlertDescription>
+          </Alert>
+          <Alert v-else-if="testResult" variant="destructive">
+            <CircleAlert />
+            <AlertTitle>测试失败</AlertTitle>
+            <AlertDescription>{{ testResult.error ?? '未知错误' }}</AlertDescription>
+          </Alert>
+        </form>
+      </DialogBody>
+
+      <!-- footer 常驻可视区；保存经 form 属性关联表单提交 -->
+      <DialogFooter class="border-t border-hairline pt-4">
+        <Button type="button" variant="outline" :disabled="isTesting" @click="runTest()">
+          <Spinner v-if="isTesting" class="size-3.5" />
+          测试
+        </Button>
+        <Button type="submit" form="service-form" :disabled="isSubmitting">保存</Button>
+      </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>
@@ -122,13 +130,14 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { FormDescription, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';

@@ -3,7 +3,7 @@
     <!-- 左侧导航（200px 画布） -->
     <aside class="flex w-[200px] shrink-0 flex-col bg-sidebar text-sidebar-foreground">
       <div class="px-4 pb-2 pt-4">
-        <span class="text-sm font-semibold tracking-wide">Tako · 章鱼</span>
+        <span class="text-sm font-semibold tracking-wide">Tako</span>
       </div>
       <nav class="flex flex-col gap-1 px-2" aria-label="主导航">
         <RouterLink

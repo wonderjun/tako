@@ -86,6 +86,9 @@ export const useTranslateStore = defineStore('translate', () => {
   /** 服务快照（含禁用项，展示时过滤）. */
   const services = ref<ServiceSetting[]>([]);
 
+  /** 选中的对照渠道；null 表示全部启用服务参与. */
+  const selectedIds = ref<string[] | null>(null);
+
   /** 最近一次请求参数快照（retry 复用；非响应式私有状态）. */
   let lastRequest: { text: string; sourceLang: string; targetLang: string } | null = null;
 
@@ -93,8 +96,15 @@ export const useTranslateStore = defineStore('translate', () => {
   // Getters
   // ============================================================================
 
-  /** 启用中的服务（order 升序，多开对照的参与方）. */
-  const activeServices = computed(() => services.value.filter((s) => s.enabled).sort((a, b) => a.order - b.order));
+  /** 全部启用中的服务（渠道选择器的选项，order 升序）. */
+  const enabledServices = computed(() => services.value.filter((s) => s.enabled).sort((a, b) => a.order - b.order));
+
+  /** 参与对照的服务（启用 ∩ 渠道选择，order 升序）. */
+  const activeServices = computed(() => {
+    if (!selectedIds.value) return enabledServices.value;
+    const picked = new Set(selectedIds.value);
+    return enabledServices.value.filter((s) => picked.has(s.id));
+  });
 
   /** 是否有子流仍在进行中. */
   const isTranslating = computed(() =>
@@ -159,7 +169,23 @@ export const useTranslateStore = defineStore('translate', () => {
     await ensureSubscribed();
   }
 
-  /** 清空输入与全部子流状态（页面「清空」按钮）. */
+  /**
+   * 切换渠道是否参与对照（同时移除其旧子流，保持展示与下一次翻译一致）.
+   *
+   * @param id      服务 id.
+   * @param checked 是否参与.
+   */
+  function toggleSelected(id: string, checked: boolean): void {
+    const current = new Set(selectedIds.value ?? enabledServices.value.map((s) => s.id));
+    if (checked) current.add(id);
+    else current.delete(id);
+    selectedIds.value = [...current];
+    for (const key of [...streams.value.keys()]) {
+      if (!current.has(key)) streams.value.delete(key);
+    }
+  }
+
+  /** 清空输入与全部子流状态（页面「清空」按钮；保留渠道选择）. */
   function reset(): void {
     input.value = '';
     requestId.value = null;
@@ -228,6 +254,8 @@ export const useTranslateStore = defineStore('translate', () => {
     requestId,
     streams,
     services,
+    selectedIds,
+    enabledServices,
     activeServices,
     isTranslating,
     loadServices,
@@ -235,6 +263,7 @@ export const useTranslateStore = defineStore('translate', () => {
     cancel,
     retry,
     reset,
+    toggleSelected,
     toggleFavorite,
   };
 });
