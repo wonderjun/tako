@@ -34,16 +34,20 @@ func main() {
 	})
 
 	// 主窗口：设置 / 服务管理 / 历史。紧凑型工具窗（对标 Bob）：
-	// 限最大宽度防超宽拉伸，内容区各页自带适度 max-w。
+	// 限最大宽度防超宽拉伸，内容区各页自带适度 max-w；禁全屏/最大化——
+	// MaxWidth 与全屏冲突（全屏空间铺不满两侧露黑边、标题栏区域错位），
+	// 工具窗无全屏场景，直接收掉两个按钮。
 	mainWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Name:      "main",
-		Title:     "Tako",
-		Width:     960,
-		Height:    640,
-		MinWidth:  720,
-		MinHeight: 480,
-		MaxWidth:  1100,
-		URL:       "/#/",
+		Name:                  "main",
+		Title:                 "Tako",
+		Width:                 960,
+		Height:                640,
+		MinWidth:              720,
+		MinHeight:             480,
+		MaxWidth:              1100,
+		URL:                   "/#/",
+		FullscreenButtonState: application.ButtonHidden,
+		MaximiseButtonState:   application.ButtonHidden,
 		Mac: application.MacWindow{
 			// 前端 app-shell.vue 顶部按此值预留 50px 拖拽区，改动需同步
 			InvisibleTitleBarHeight: 50,
