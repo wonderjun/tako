@@ -118,6 +118,20 @@ describe('useTranslateStore（mock 桥驱动）', () => {
     }
   });
 
+  it('hasVisibleStreams 随子流有无活动切换（结果区显隐依据）', async () => {
+    const store = useTranslateStore();
+    await store.loadServices();
+    expect(store.hasVisibleStreams).toBe(false);
+
+    store.input = 'visible case';
+    await store.translate();
+    // pending 子流已建立，发起即应展示结果区
+    expect(store.hasVisibleStreams).toBe(true);
+
+    store.reset();
+    expect(store.hasVisibleStreams).toBe(false);
+  });
+
   it('retry 仅重译目标服务，其余子流保持完成态', async () => {
     const store = useTranslateStore();
     await store.loadServices();

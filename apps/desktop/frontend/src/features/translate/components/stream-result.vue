@@ -1,12 +1,9 @@
 <template>
   <div class="flex min-h-0 flex-1 flex-col gap-2">
-    <!-- 状态区 -->
-    <div class="flex min-h-5 items-center gap-2">
-      <template v-if="state">
-        <Spinner v-if="state.status === 'pending'" class="size-3.5 text-muted-foreground" />
-        <span v-else-if="state.status === 'streaming'" class="text-xs text-muted-foreground">翻译中…</span>
-        <Badge v-else-if="state.status === 'retrying'" variant="warning">重试中 第{{ state.attempt ?? 0 }}次</Badge>
-      </template>
+    <!-- 状态区：仅重试时占位（pending/streaming 由译文区占位文与光标反馈），
+         平常不渲染，避免译文上方留出空行 -->
+    <div v-if="state?.status === 'retrying'" class="flex min-h-5 items-center gap-2">
+      <Badge variant="warning">重试中 第{{ state.attempt ?? 0 }}次</Badge>
     </div>
 
     <!-- 错误提示 -->
@@ -68,7 +65,6 @@ import { CircleAlert, Copy, RotateCcw, Star } from '@lucide/vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 import { useTranslateStore } from '@/features/translate/store';
 import { errorCopy } from '../pages/utils/error-copy';
 

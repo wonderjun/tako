@@ -113,6 +113,11 @@ export const useTranslateStore = defineStore('translate', () => {
     ),
   );
 
+  /** 是否有可展示的子流（非 idle 或已有文本；cancelled/清空后自动隐藏）. */
+  const hasVisibleStreams = computed(() =>
+    [...streams.value.values()].some((s) => s.status !== 'idle' || s.text.length > 0),
+  );
+
   // ============================================================================
   // Actions
   // ============================================================================
@@ -258,6 +263,7 @@ export const useTranslateStore = defineStore('translate', () => {
     enabledServices,
     activeServices,
     isTranslating,
+    hasVisibleStreams,
     loadServices,
     translate,
     cancel,

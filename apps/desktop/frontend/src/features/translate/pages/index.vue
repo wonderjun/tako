@@ -55,8 +55,8 @@
       </div>
     </section>
 
-    <!-- 结果区（多开对照） -->
-    <section class="flex min-h-0 flex-1 flex-col">
+    <!-- 结果区（多开对照）：默认隐藏，有翻译活动或无可用服务（引导卡）时展现 -->
+    <section v-if="store.activeServices.length === 0 || store.hasVisibleStreams" class="flex min-h-0 flex-1 flex-col">
       <Card v-if="store.activeServices.length === 0">
         <CardContent class="flex flex-col items-center gap-1 py-10 text-center">
           <p class="text-sm font-medium">还没有启用的翻译服务</p>
