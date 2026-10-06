@@ -64,6 +64,10 @@ func (s *Service) ServiceStartup(context.Context, application.ServiceOptions) er
 	if err != nil {
 		return err
 	}
+	if err := seedDefaultServices(st); err != nil {
+		_ = st.Close()
+		return err
+	}
 	s.mu.Lock()
 	s.store = st
 	s.mu.Unlock()
@@ -430,6 +434,39 @@ func (s *Service) ClearHistory() error {
 // ---------------------------------------------------------------------------
 
 const settingsKeyApp = "app"
+
+// settingsKeySeeded 首启播种标记：免 key 服务仅在首次空库时播种一次，
+// 用户此后删光服务不会被复活打扰。
+const settingsKeySeeded = "servicesSeeded"
+
+// seedDefaultServices 首启播种免 key 服务（google/microsoft 均无需 apiKey），
+// 让首次运行即得真实翻译与双渠道对照；已播过或服务表非空时跳过。
+func seedDefaultServices(st *store.Store) error {
+	_, seeded, err := st.GetSetting(settingsKeySeeded)
+	if err != nil {
+		return err
+	}
+	if seeded {
+		return nil
+	}
+	services, err := st.ListServices()
+	if err != nil {
+		return err
+	}
+	if len(services) == 0 {
+		seeds := []store.Service{
+			{Name: "Google 翻译", Type: "google", Enabled: true, Config: store.ServiceConfig{Order: 0}},
+			{Name: "Microsoft 翻译", Type: "microsoft", Enabled: true, Config: store.ServiceConfig{Order: 1}},
+		}
+		for _, svc := range seeds {
+			if _, err := st.SaveService(svc); err != nil {
+				return err
+			}
+		}
+	}
+	// 表非空（用户已有配置）同样置位：播种只弥补"首次零服务"的开箱空窗。
+	return st.SetSetting(settingsKeySeeded, json.RawMessage(`true`))
+}
 
 // defaultAppSettings 缺省设置（与前端 mock 一致）。
 func defaultAppSettings() AppSettings {
