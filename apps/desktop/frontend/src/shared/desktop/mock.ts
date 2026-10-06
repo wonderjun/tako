@@ -113,11 +113,11 @@ export function createMockBridge(events: Emitter<MockBridgeEvents>): Bridge {
     },
 
     async saveService(service) {
-      const existing = services.get(service.id);
-      const saved: ServiceSetting = existing
-        ? { ...service, createdAt: existing.createdAt, updatedAt: now() }
-        : { ...service, createdAt: now(), updatedAt: now() };
-      services.set(saved.id, saved);
+      // 新增（id 空串）由桥侧生成 id 并落 createdAt，编辑保留原 createdAt；与 saveHistory 同约定
+      const id = service.id || nextId('svc');
+      const existing = services.get(id);
+      const saved: ServiceSetting = { ...service, id, createdAt: existing?.createdAt ?? now(), updatedAt: now() };
+      services.set(id, saved);
       return saved;
     },
 
