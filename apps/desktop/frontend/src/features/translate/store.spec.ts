@@ -17,6 +17,17 @@ describe('applyStreamEvent', () => {
     expect(state.status).toBe('streaming');
   });
 
+  it('delta 丢弃前导空白，finish 修剪两端空白（LLM 会先吐换行）', () => {
+    const state: StreamState = { status: 'pending', text: '' };
+    applyStreamEvent(state, { requestId: 'r', serviceId: 's', type: 'delta', text: '\n' });
+    applyStreamEvent(state, { requestId: 'r', serviceId: 's', type: 'delta', text: ' 你好' });
+    applyStreamEvent(state, { requestId: 'r', serviceId: 's', type: 'delta', text: '，世界' });
+    expect(state.text).toBe('你好，世界');
+
+    applyStreamEvent(state, { requestId: 'r', serviceId: 's', type: 'finish', text: ' 你好，世界\n' });
+    expect(state.text).toBe('你好，世界');
+  });
+
   it('finish 以 e.text 覆盖累积文本（防丢字）', () => {
     const state: StreamState = { status: 'streaming', text: '累积' };
     applyStreamEvent(state, { requestId: 'r', serviceId: 's', type: 'finish', text: '完整译文' });

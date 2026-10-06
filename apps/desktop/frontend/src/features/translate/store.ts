@@ -39,16 +39,19 @@ export function applyStreamEvent(state: StreamState, e: StreamEvent): void {
   switch (e.type) {
     case 'message-start':
       break;
-    case 'delta':
-      state.text += e.text ?? '';
+    case 'delta': {
+      // 丢弃前导空白（个别 LLM 会先吐换行，whitespace-pre-wrap 下渲染成
+      // 顶部空行）：累积仍为全空白时重置并 trimStart 新分片，中间换行不受影响
+      state.text = state.text.trim() === '' ? (e.text ?? '').trimStart() : state.text + (e.text ?? '');
       state.status = 'streaming';
       break;
+    }
     case 'stream-retry':
       state.status = 'retrying';
       state.attempt = e.attempt;
       break;
     case 'finish':
-      state.text = e.text ?? state.text;
+      state.text = (e.text ?? state.text).trim();
       state.status = 'done';
       state.attempt = undefined;
       break;
