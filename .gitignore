@@ -1,0 +1,66 @@
+# ─────────────────────────────────────────────
+# 通用 (General)
+# ─────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Desktop.ini
+
+# IDE / 编辑器
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.cursor/
+.trae/
+.qoder/
+.windsurf/
+
+# 日志
+logs/
+*.log
+
+# 本地环境变量（敏感信息不入库）
+.env
+.env.local
+.env.*.local
+*.local
+
+# ─────────────────────────────────────────────
+# 桌面壳 (Wails 3 / Go)
+# ─────────────────────────────────────────────
+apps/desktop/build/bin/
+apps/desktop/bin/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# ─────────────────────────────────────────────
+# 前端 (Vue 3 + Vite + TypeScript)
+# ─────────────────────────────────────────────
+apps/desktop/frontend/node_modules/
+apps/desktop/frontend/dist/
+apps/desktop/frontend/.eslintcache
+apps/desktop/frontend/*.tsbuildinfo
+
+# Wails 生成的 bindings（wails3 generate 产物，不入库）
+apps/desktop/frontend/bindings/
+
+# ─────────────────────────────────────────────
+# Go
+# ─────────────────────────────────────────────
+*.sqlite
+*.sqlite3
+*.db
+
+# 会话/临时
+.refactor-tmp/

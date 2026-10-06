@@ -1,0 +1,23 @@
+# ===== ↑ 以上同步自 .gitignore（「从 .gitignore 同步」只重写以上部分）=====
+# 本文件供 ZCode 索引使用；与 .gitignore 保持同步，新增忽略项写在自定义区。
+
+.DS_Store
+logs/
+*.log
+.env
+.env.local
+*.local
+node_modules/
+apps/desktop/build/bin/
+apps/desktop/bin/
+apps/desktop/frontend/dist/
+apps/desktop/frontend/bindings/
+apps/desktop/frontend/.eslintcache
+*.tsbuildinfo
+*.sqlite
+*.sqlite3
+*.db
+*.exe
+*.test
+# ----- ↑ 以上为 ZCode 默认排除规则（自定义规则请写在本行下方，不会被同步/恢复改动）-----
+# 自定义：docs/spec 为分工 spec，体积小保留索引；无额外排除

@@ -1,0 +1,801 @@
+@import 'tailwindcss';
+
+@import 'tw-animate-css';
+
+@import 'vue-sonner/style.css';
+
+/* Geist 可变字体 (SIL OFL 1.1, 自托管 latin 子集): 拉丁字符/数字用 Geist, 中文回落系统中文字体 */
+@font-face {
+  font-family: 'Geist Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../shared/assets/fonts/geist-var-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Crimson Pro 可变衬线 (OFL 1.1, 自托管 latin 子集): 展示级标题用衬线, 中文回落宋体系.
+   仅用于 font-display 工具类 (着陆页问候/空态标题等展示位), 正文 UI 不走此族. */
+@font-face {
+  font-family: 'Crimson Pro Variable';
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url('../shared/assets/fonts/crimson-pro-var-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Crimson Pro Variable';
+  font-style: italic;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url('../shared/assets/fonts/crimson-pro-var-italic-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+/* 主题 token 一律引用 :root / .dark 的运行时变量, 保证 dark 切换生效 */
+@theme inline {
+  --font-sans: 'Geist Variable', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-heading: 'Geist Variable', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  /* 展示衬线族: 拉丁 Crimson Pro + 中文宋体系回落, 只用于 font-display 展示位 */
+  --font-display: 'Crimson Pro Variable', 'Songti SC', 'STSong', 'Noto Serif SC', serif;
+  /* 正文衬线族: 与 display 同栈, 只用于 data-reading-font='serif' 的会话正文 */
+  --font-serif: 'Crimson Pro Variable', 'Songti SC', 'STSong', 'Noto Serif SC', serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-input-focus: var(--input-focus);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-solid: var(--destructive-solid);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-brand: var(--brand);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-subtle: var(--info-subtle);
+  --color-destructive-subtle: var(--destructive-subtle);
+  --color-state-hover: var(--state-hover);
+  --color-state-selected: var(--state-selected);
+  --color-glass: var(--glass);
+  --color-mention-file: var(--mention-file);
+  --color-mention-note: var(--mention-note);
+  --color-mention-flash: var(--mention-flash);
+  --color-mention-skill: var(--mention-skill);
+  --color-mention-mcp: var(--mention-mcp);
+  --color-mention-agent: var(--mention-agent);
+  --color-mention-quote: var(--mention-quote);
+  --color-mention-conversation: var(--mention-conversation);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-hairline-shell: var(--hairline-shell);
+  --color-overlay: var(--overlay);
+  --shadow-elevation-1: var(--elevation-1);
+  --shadow-elevation-2: var(--elevation-2);
+  --shadow-elevation-3: var(--elevation-3);
+  --shadow-elevation-shell: var(--elevation-shell);
+  --text-body: 13px;
+  --text-body-lg: 15px;
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  /* 暖白纸面: 近白提亮 (Qoder 式纸面) — 表面与纸内描边近中性, 暖度集中在画布 (--sidebar) */
+  --background: oklch(0.995 0.001 90);
+  --foreground: oklch(0.24 0.004 80);
+  --card: oklch(0.995 0.001 90);
+  --card-foreground: oklch(0.24 0.004 80);
+  --popover: oklch(0.995 0.001 90);
+  --popover-foreground: oklch(0.24 0.004 80);
+  /* 品牌黑：避免纯黑，保留纸墨般的暖中性层次 */
+  --primary: oklch(0.6 0.16 32);
+  --primary-foreground: oklch(0.985 0.002 85);
+  --secondary: oklch(0.958 0.003 85);
+  --secondary-foreground: oklch(0.32 0.004 80);
+  --muted: oklch(0.968 0.002 85);
+  --muted-foreground: oklch(0.52 0.005 80);
+  --accent: oklch(0.958 0.003 85);
+  --accent-foreground: oklch(0.32 0.004 80);
+  --destructive: oklch(0.53 0.17 25);
+  --destructive-foreground: oklch(0.985 0 0);
+  /* destructive 实心按钮底色: 浅色下与 --destructive 同源 (深色需降明度防刺眼, 见 .dark) */
+  --destructive-solid: var(--destructive);
+  /* 功能状态色: hue 复用 chart-2/3/4 (150/70/245) 与图表色同源, chroma ≤ 0.12 保持低饱和
+       (info 无独立色相需求时可直接用中性色; 语义边界见 上游前端/DESIGN.md) */
+  --success: oklch(0.52 0.07 150);
+  --success-foreground: oklch(0.99 0.002 75);
+  --success-subtle: oklch(0.965 0.014 150);
+  --warning: oklch(0.55 0.115 62);
+  --warning-foreground: oklch(0.985 0 0);
+  --warning-subtle: oklch(0.955 0.04 90);
+  --info: oklch(0.52 0.065 245);
+  --info-foreground: oklch(0.99 0.002 75);
+  --info-subtle: oklch(0.965 0.013 245);
+  --destructive-subtle: oklch(0.966 0.016 27);
+  /* 交互态底色: hover/选中用前景色低透明混合, 全主题自适应 (幽灵按钮/菜单项/列表行) */
+  --state-hover: color-mix(in oklab, var(--foreground) 6%, transparent);
+  --state-selected: color-mix(in oklab, var(--foreground) 10%, transparent);
+  /* 磨砂浮层底色: popover 90% 不透明, 配 backdrop-blur 用 (深色引 --popover 自动生效) */
+  --glass: color-mix(in oklab, var(--popover) 90%, transparent);
+  /* 引用分类色 (@ / # / ! / 斜杠 chip 与弹窗图标): 8 类色相需在正文内可辨,
+     chroma ≤ 0.11 仍远低于原裸色板 (0.2+); 语义色全主题共享, 家族块不覆写 */
+  --mention-file: oklch(0.52 0.1 250);
+  --mention-note: oklch(0.52 0.09 160);
+  --mention-flash: oklch(0.58 0.1 70);
+  --mention-skill: oklch(0.53 0.11 295);
+  --mention-mcp: oklch(0.53 0.085 210);
+  --mention-agent: oklch(0.56 0.11 45);
+  --mention-quote: oklch(0.53 0.085 235);
+  --mention-conversation: oklch(0.54 0.1 10);
+  /* 发丝线与高光描边: 取代 border-border/50~80 四档随手写; 近中性 (色度 ≤0.004), 暖度主力移到画布 */
+  --hairline: oklch(0.92 0.004 85);
+  --hairline-strong: oklch(0.87 0.005 85);
+  /* 壳卡专用软描边: 比画布暗约 6–8 个 RGB 阶; color-mix 相对 --sidebar 定义,
+       一处书写四个主题家族自适应 (家族块只覆盖 --sidebar, 变量惰性解析自动跟随)。
+       禁止复用 hairline (0.92, 比纸面暗 ~22 阶) — 壳卡尺度上读作黑线 (234 硬环教训) */
+  --hairline-shell: color-mix(in oklch, var(--sidebar), oklch(0.24 0.006 80) 3%);
+  /* 暖调海拔: 漫射环境光 + 短落影双层 (Qoder 式软阴影); 深色下退化为主要靠 hairline-strong 表达层次 */
+  --elevation-1: 0 1px 2px oklch(0.24 0.006 80 / 0.05);
+  --elevation-2: 0 0 14px oklch(0.24 0.006 80 / 0.05), 0 4px 8px oklch(0.24 0.006 80 / 0.05);
+  --elevation-3: 0 0 20px oklch(0.24 0.006 80 / 0.06), 0 12px 32px oklch(0.24 0.006 80 / 0.1);
+  /* Shell 内容卡片 (窗口级): 纯投影零 inset — token 内禁 inset 环 / 0 0 1px 扩边 (234 硬环比卡面 247
+       暗 13 个色阶, 夹在投影坡与卡面间读作一条黑沟, 用户红线); 禁 0 0 Npx 环向光晕 (画布侧涂灰带)。
+       阴影可视空间 < 4px (悬浮间隙 p-1 且卡片父容器 overflow-hidden): 模糊半径 >> 4px 会被容器
+       方角裁出直角补丁 (教训: 0 10px 28px / 0.06 实测)。悬浮感由面差 + hairline-shell 描边承担,
+       阴影只留一丝紧贴落影; 想更有浮力去加深 --sidebar 面差 (全族 + sidebar-accent 同步) */
+  --elevation-shell: 0 1px 3px oklch(0.24 0.006 80 / 0.05);
+  /* 弹窗蒙层: 30% 暖黑 + 配合 backdrop-blur 的磨砂感 (Qoder 式), 取代 bg-black/80 死黑 */
+  --overlay: oklch(0.24 0.006 80 / 0.3);
+  /* 低对比中性边框与焦点环 */
+  --border: oklch(0.92 0.004 85);
+  --input: oklch(0.92 0.004 85);
+  --ring: oklch(0.6 0.13 32);
+  /* 输入控件聚焦描边色: 焦点环淡出为描边加深 (输入家族不再用 ring 盒影) */
+  --input-focus: color-mix(in oklab, var(--ring) 76%, var(--background));
+  --brand: oklch(0.6 0.16 32);
+  --brand-muted: oklch(0.885 0.045 40);
+  --brand-subtle: oklch(0.955 0.024 40);
+  /* 图表保留低饱和语义色，避免多个数据系列难以区分 */
+  --chart-1: oklch(0.3 0.002 75);
+  --chart-2: oklch(0.6 0.045 150);
+  --chart-3: oklch(0.62 0.05 245);
+  --chart-4: oklch(0.66 0.05 70);
+  --chart-5: oklch(0.49 0.02 75);
+  --radius: 10px;
+  /* 动效时长 token: 交互反馈用 fast, 状态过渡用 normal (新代码统一引用, 遵循 prefers-reduced-motion) */
+  --motion-fast: 120ms;
+  --motion-normal: 200ms;
+  /* Sidebar: 画布比内容区深一档 (Qoder parchment #fbfbfa↔#fdfcfa 同向面差) — 无色相时靠明度分层,
+       与内容卡片 (0.995) 拉开 0.047 面差; hover/选中 sidebar-accent 同步下沉保持 0.038 对比。
+       面差是壳卡悬浮感的主要承担者 (阴影可视空间 < 4px, 见 --elevation-shell 注释), 调整须全族同步 */
+  --sidebar: oklch(0.948 0.004 85);
+  --sidebar-foreground: oklch(0.34 0.004 80);
+  --sidebar-primary: oklch(0.6 0.16 32);
+  --sidebar-primary-foreground: oklch(0.985 0.002 85);
+  --sidebar-accent: oklch(0.91 0.005 85);
+  --sidebar-accent-foreground: oklch(0.32 0.004 80);
+  --sidebar-border: oklch(0.9 0.005 85);
+  --sidebar-ring: oklch(0.6 0.13 32);
+}
+
+.dark {
+  /* Codex 风格：炭黑而非纯黑，减少长时间阅读疲劳 (微暖炭黑, chroma ≤0.005) */
+  --background: oklch(0.21 0.004 80);
+  --foreground: oklch(0.82 0.004 80);
+  --card: oklch(0.25 0.005 80);
+  --card-foreground: oklch(0.82 0.004 80);
+  --popover: oklch(0.25 0.005 80);
+  --popover-foreground: oklch(0.82 0.004 80);
+  /* 深色模式主操作用中高亮灰白而非近纯白：0.94 级高亮只留给选中/焦点，正文与主按钮降一档减刺眼 */
+  --primary: oklch(0.75 0.13 33);
+  --primary-foreground: oklch(0.2 0.04 30);
+  --secondary: oklch(0.3 0.005 80);
+  --secondary-foreground: oklch(0.82 0.004 80);
+  --muted: oklch(0.3 0.005 80);
+  --muted-foreground: oklch(0.61 0.006 80);
+  --accent: oklch(0.3 0.005 80);
+  --accent-foreground: oklch(0.82 0.004 80);
+  --destructive: oklch(0.71 0.16 22);
+  --destructive-foreground: oklch(0.985 0 0);
+  /* destructive 实心按钮底色 (深色): --destructive 提亮后偏浅偏荧光, 实心填充回降到 0.55 */
+  --destructive-solid: oklch(0.55 0.14 25);
+  /* 功能状态色: 深色整体提亮一档, subtle 背景降至近表面色 */
+  --success: oklch(0.7 0.07 150);
+  --success-foreground: oklch(0.21 0.002 75);
+  --success-subtle: oklch(0.3 0.022 150);
+  --warning: oklch(0.76 0.11 65);
+  --warning-foreground: oklch(0.21 0.002 75);
+  --warning-subtle: oklch(0.31 0.026 70);
+  --info: oklch(0.7 0.065 245);
+  --info-foreground: oklch(0.21 0.002 75);
+  --info-subtle: oklch(0.3 0.022 245);
+  --destructive-subtle: oklch(0.31 0.024 27);
+  /* 交互态底色 (深色): 前景混合比例略高于浅色 (见 :root 同名 token 注释) */
+  --state-hover: color-mix(in oklab, var(--foreground) 8%, transparent);
+  --state-selected: color-mix(in oklab, var(--foreground) 14%, transparent);
+  /* 引用分类色 (深色): 与浅色同色相, 整体提亮一档 */
+  --mention-file: oklch(0.72 0.085 250);
+  --mention-note: oklch(0.72 0.08 160);
+  --mention-flash: oklch(0.76 0.09 75);
+  --mention-skill: oklch(0.73 0.09 295);
+  --mention-mcp: oklch(0.73 0.075 210);
+  --mention-agent: oklch(0.74 0.09 50);
+  --mention-quote: oklch(0.73 0.075 235);
+  --mention-conversation: oklch(0.74 0.085 10);
+  --hairline: oklch(1 0.003 80 / 12%);
+  --hairline-strong: oklch(1 0.003 80 / 20%);
+  /* 壳卡软描边 (深色): 卡面比画布暗, 描边向亮调混; 约束同亮色 (见 :root 同名 token 注释) */
+  --hairline-shell: color-mix(in oklch, var(--background), oklch(1 0.003 80) 6%);
+  --elevation-1: 0 1px 2px oklch(0 0 0 / 0.3);
+  --elevation-2: 0 0 14px oklch(0 0 0 / 0.28), 0 6px 18px oklch(0 0 0 / 0.36);
+  --elevation-3: 0 0 20px oklch(0 0 0 / 0.32), 0 12px 32px oklch(0 0 0 / 0.44);
+  /* Shell 内容卡片 (深色): 纯投影零 inset, 约束同亮色 (见 :root 同名 token 注释) */
+  --elevation-shell: 0 1px 3px oklch(0 0 0 / 0.3);
+  /* 弹窗蒙层 (深色): 纯黑 55% + backdrop-blur */
+  --overlay: oklch(0 0 0 / 0.55);
+  /* 低对比透明边框 */
+  --border: oklch(1 0.003 80 / 12%);
+  --input: oklch(1 0.003 80 / 16%);
+  --ring: oklch(0.75 0.12 33);
+  /* 输入控件聚焦描边色 (深色): 向前景方向混, 深色画布上保持可见对比 */
+  --input-focus: color-mix(in oklab, var(--ring) 75%, var(--foreground));
+  --brand: oklch(0.75 0.13 33);
+  --brand-muted: oklch(0.38 0.06 32);
+  --brand-subtle: oklch(0.31 0.04 32);
+  /* 图表整体提亮，并保留低饱和语义色 */
+  --chart-1: oklch(0.7 0.002 75);
+  --chart-2: oklch(0.7 0.045 150);
+  --chart-3: oklch(0.72 0.05 245);
+  --chart-4: oklch(0.73 0.05 70);
+  --chart-5: oklch(0.61 0.02 75);
+  /* Sidebar: 与页面背景保持一档表面差 */
+  --sidebar: oklch(0.25 0.005 80);
+  --sidebar-foreground: oklch(0.82 0.004 80);
+  --sidebar-primary: oklch(0.75 0.13 33);
+  --sidebar-primary-foreground: oklch(0.2 0.04 30);
+  --sidebar-accent: oklch(0.3 0.005 80);
+  --sidebar-accent-foreground: oklch(0.86 0.004 80);
+  --sidebar-border: oklch(1 0.003 80 / 12%);
+  --sidebar-ring: oklch(0.75 0.12 33);
+}
+
+/* ==========================================================================
+   主题家族 (data-theme): Qoder 式成套主题 — 表面/前景/发丝线/accent 整组切换,
+   .dark 管明暗、data-theme 管色系; default 不写属性 = 上方 :root/.dark 基准.
+   命名均为自有意象名, 不复用 Qoder 主题名. 语义色全主题共享不变.
+   ========================================================================== */
+
+/* 素笺 paper: Claude 式奶油纸面 + 珊瑚橘 accent (纸面近白, 主题感靠画布与 accent) */
+html[data-theme='paper'] {
+  --background: oklch(0.985 0.005 90);
+  --foreground: oklch(0.245 0.006 60);
+  --card: oklch(0.985 0.005 90);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.985 0.005 90);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.56 0.135 42);
+  --primary-foreground: oklch(0.98 0.008 70);
+  --secondary: oklch(0.948 0.008 88);
+  --secondary-foreground: oklch(0.34 0.01 70);
+  --muted: oklch(0.958 0.007 88);
+  --muted-foreground: oklch(0.512 0.017 85);
+  --accent: oklch(0.948 0.009 85);
+  --accent-foreground: oklch(0.34 0.01 70);
+  --hairline: oklch(0.905 0.009 85);
+  --hairline-strong: oklch(0.855 0.011 82);
+  --border: oklch(0.905 0.009 85);
+  --input: oklch(0.905 0.009 85);
+  --ring: oklch(0.55 0.13 40);
+  --brand: oklch(0.56 0.135 42);
+  --brand-muted: oklch(0.855 0.011 82);
+  --brand-subtle: oklch(0.945 0.025 55);
+  --chart-1: oklch(0.245 0.006 60);
+  /* 画布必须深于内容区 (bg 0.985↔canvas 0.938, 同 default 0.047 档差): 倒挂会让壳卡落影
+       打在更暗的卡面上, 分界读成硬 border 线; sidebar-accent 同步下沉保持 0.038 hover 对比 */
+  --sidebar: oklch(0.938 0.011 90);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: oklch(0.56 0.135 42);
+  --sidebar-primary-foreground: oklch(0.98 0.008 70);
+  --sidebar-accent: oklch(0.9 0.012 88);
+  --sidebar-accent-foreground: oklch(0.34 0.01 70);
+  --sidebar-border: oklch(0.905 0.009 85);
+  --sidebar-ring: oklch(0.58 0.13 40);
+}
+
+html.dark[data-theme='paper'] {
+  --background: oklch(0.23 0.01 67);
+  --foreground: oklch(0.83 0.011 77);
+  --card: oklch(0.255 0.011 73);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.255 0.011 73);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.716 0.116 42);
+  --primary-foreground: oklch(0.19 0.02 40);
+  --secondary: oklch(0.293 0.012 67);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.293 0.012 67);
+  --muted-foreground: oklch(0.615 0.024 65);
+  --accent: oklch(0.293 0.012 67);
+  --accent-foreground: var(--foreground);
+  --hairline: oklch(0.85 0.02 70 / 14%);
+  --hairline-strong: oklch(0.85 0.02 70 / 22%);
+  --border: oklch(0.85 0.02 70 / 14%);
+  --input: oklch(0.85 0.02 70 / 18%);
+  --ring: oklch(0.65 0.03 60);
+  --brand: oklch(0.716 0.116 42);
+  --brand-muted: oklch(0.3 0.03 40);
+  --brand-subtle: oklch(0.27 0.03 45);
+  --chart-1: oklch(0.83 0.011 77);
+  --sidebar: oklch(0.255 0.011 73);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: oklch(0.716 0.116 42);
+  --sidebar-primary-foreground: oklch(0.19 0.02 40);
+  --sidebar-accent: oklch(0.293 0.012 67);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: oklch(0.85 0.02 70 / 14%);
+  --sidebar-ring: oklch(0.65 0.03 60);
+}
+
+/* 抹茶 matcha: 近白微绿纸面 + 绿画布 + 抹茶绿 accent, 前景为绿墨 */
+html[data-theme='matcha'] {
+  --background: oklch(0.99 0.004 160);
+  --foreground: oklch(0.382 0.06 143);
+  --card: oklch(0.99 0.004 160);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.99 0.004 160);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.5 0.075 172);
+  --primary-foreground: oklch(0.975 0.005 155);
+  --secondary: oklch(0.953 0.009 168);
+  --secondary-foreground: oklch(0.473 0.079 172);
+  --muted: oklch(0.963 0.008 165);
+  --muted-foreground: oklch(0.477 0.023 154);
+  --accent: oklch(0.953 0.012 170);
+  --accent-foreground: oklch(0.473 0.079 172);
+  --hairline: oklch(0.91 0.01 170);
+  --hairline-strong: oklch(0.85 0.016 170);
+  --border: oklch(0.91 0.01 170);
+  --input: oklch(0.91 0.01 170);
+  --ring: oklch(0.55 0.09 172);
+  --brand: oklch(0.5 0.075 172);
+  --brand-muted: oklch(0.91 0.01 170);
+  --brand-subtle: oklch(0.945 0.015 170);
+  --chart-1: oklch(0.382 0.06 143);
+  /* 画布必须深于内容区 (bg 0.99↔canvas 0.943): 倒挂会让壳卡分界读成硬 border 线 (同 paper 注释);
+       sidebar-accent 同步下沉保持 0.038 hover 对比 */
+  --sidebar: oklch(0.943 0.012 165);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: oklch(0.5 0.075 172);
+  --sidebar-primary-foreground: oklch(0.975 0.005 155);
+  --sidebar-accent: oklch(0.905 0.015 170);
+  --sidebar-accent-foreground: oklch(0.473 0.079 172);
+  --sidebar-border: oklch(0.91 0.01 170);
+  --sidebar-ring: oklch(0.55 0.09 172);
+}
+
+html.dark[data-theme='matcha'] {
+  --background: oklch(0.225 0.015 166);
+  --foreground: oklch(0.84 0.011 168);
+  --card: oklch(0.249 0.016 169);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.249 0.016 169);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.765 0.108 170);
+  --primary-foreground: oklch(0.15 0.02 170);
+  --secondary: oklch(0.3 0.02 167);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.3 0.02 167);
+  --muted-foreground: oklch(0.615 0.03 167);
+  --accent: oklch(0.3 0.02 167);
+  --accent-foreground: var(--foreground);
+  --hairline: oklch(0.8 0.02 166 / 14%);
+  --hairline-strong: oklch(0.8 0.02 166 / 22%);
+  --border: oklch(0.8 0.02 166 / 14%);
+  --input: oklch(0.8 0.02 166 / 18%);
+  --ring: oklch(0.65 0.03 167);
+  --brand: oklch(0.765 0.108 170);
+  --brand-muted: oklch(0.28 0.02 168);
+  --brand-subtle: oklch(0.27 0.02 168);
+  --chart-1: oklch(0.84 0.011 168);
+  --sidebar: oklch(0.249 0.016 169);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: oklch(0.765 0.108 170);
+  --sidebar-primary-foreground: oklch(0.15 0.02 170);
+  --sidebar-accent: oklch(0.3 0.02 167);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: oklch(0.8 0.02 166 / 14%);
+  --sidebar-ring: oklch(0.65 0.03 167);
+}
+
+/* 琥珀 amber: 近白橄榄纸面 + 米画布 + 卡其发丝线; 浅色墨黑 accent (近无彩), 深色琥珀金 accent */
+html[data-theme='amber'] {
+  --background: oklch(0.99 0.004 105);
+  --foreground: oklch(0.249 0.015 107);
+  --card: oklch(0.99 0.004 105);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.99 0.004 105);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.18 0.005 105);
+  --primary-foreground: oklch(0.972 0.006 105);
+  --secondary: oklch(0.953 0.01 105);
+  --secondary-foreground: oklch(0.312 0.055 109);
+  --muted: oklch(0.963 0.009 105);
+  --muted-foreground: oklch(0.448 0.019 111);
+  --accent: oklch(0.953 0.016 110);
+  --accent-foreground: oklch(0.312 0.055 109);
+  --hairline: oklch(0.9 0.016 108);
+  --hairline-strong: oklch(0.84 0.022 108);
+  --border: oklch(0.9 0.016 108);
+  --input: oklch(0.9 0.016 108);
+  --ring: oklch(0.57 0.028 110);
+  --brand: oklch(0.18 0.005 105);
+  --brand-muted: oklch(0.9 0.016 108);
+  --brand-subtle: oklch(0.935 0.018 105);
+  --chart-1: oklch(0.249 0.015 107);
+  --sidebar: oklch(0.943 0.013 105);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: oklch(0.18 0.005 105);
+  --sidebar-primary-foreground: oklch(0.972 0.006 105);
+  --sidebar-accent: oklch(0.905 0.018 110);
+  --sidebar-accent-foreground: oklch(0.312 0.055 109);
+  --sidebar-border: oklch(0.9 0.016 108);
+  --sidebar-ring: oklch(0.57 0.028 110);
+}
+
+html.dark[data-theme='amber'] {
+  --background: oklch(0.235 0.01 125);
+  --foreground: oklch(0.84 0.012 101);
+  --card: oklch(0.26 0.011 122);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.26 0.011 122);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.78 0.125 96);
+  --primary-foreground: oklch(0.19 0.02 95);
+  --secondary: oklch(0.31 0.011 122);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.31 0.011 122);
+  --muted-foreground: oklch(0.625 0.019 100);
+  --accent: oklch(0.31 0.011 122);
+  --accent-foreground: var(--foreground);
+  --hairline: oklch(0.8 0.02 100 / 14%);
+  --hairline-strong: oklch(0.8 0.02 100 / 22%);
+  --border: oklch(0.8 0.02 100 / 14%);
+  --input: oklch(0.8 0.02 100 / 18%);
+  --ring: oklch(0.62 0.02 100);
+  --brand: oklch(0.78 0.125 96);
+  --brand-muted: oklch(0.3 0.03 95);
+  --brand-subtle: oklch(0.27 0.025 95);
+  --chart-1: oklch(0.84 0.012 101);
+  --sidebar: oklch(0.26 0.011 122);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: oklch(0.78 0.125 96);
+  --sidebar-primary-foreground: oklch(0.19 0.02 95);
+  --sidebar-accent: oklch(0.31 0.011 122);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: oklch(0.8 0.02 100 / 14%);
+  --sidebar-ring: oklch(0.62 0.02 100);
+}
+
+/* 松林 pine: 浅色表面近中性 + 灰绿 accent; 深色绿炭 + 松绿 accent */
+html[data-theme='pine'] {
+  --background: oklch(0.992 0.002 135);
+  --foreground: oklch(0.242 0.008 153);
+  --card: oklch(0.992 0.002 135);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.992 0.002 135);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.429 0.044 160);
+  --primary-foreground: oklch(0.977 0.003 135);
+  --secondary: oklch(0.955 0.005 135);
+  --secondary-foreground: oklch(0.362 0.039 158);
+  --muted: oklch(0.965 0.004 135);
+  --muted-foreground: oklch(0.437 0.014 153);
+  --accent: oklch(0.955 0.007 135);
+  --accent-foreground: oklch(0.362 0.039 158);
+  --hairline: oklch(0.91 0.006 135);
+  --hairline-strong: oklch(0.855 0.01 138);
+  --border: oklch(0.91 0.006 135);
+  --input: oklch(0.91 0.006 135);
+  --ring: oklch(0.508 0.053 158);
+  --brand: oklch(0.429 0.044 160);
+  --brand-muted: oklch(0.91 0.006 135);
+  --brand-subtle: oklch(0.955 0.005 135);
+  --chart-1: oklch(0.242 0.008 153);
+  --sidebar: oklch(0.945 0.007 140);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: oklch(0.429 0.044 160);
+  --sidebar-primary-foreground: oklch(0.977 0.003 135);
+  --sidebar-accent: oklch(0.907 0.009 140);
+  --sidebar-accent-foreground: oklch(0.362 0.039 158);
+  --sidebar-border: oklch(0.91 0.006 135);
+  --sidebar-ring: oklch(0.508 0.053 158);
+}
+
+html.dark[data-theme='pine'] {
+  --background: oklch(0.262 0.01 151);
+  --foreground: oklch(0.82 0.005 146);
+  --card: oklch(0.281 0.012 150);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.281 0.012 150);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.627 0.118 150);
+  --primary-foreground: oklch(0.17 0.02 150);
+  --secondary: oklch(0.33 0.01 152);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.33 0.01 152);
+  --muted-foreground: oklch(0.635 0.016 152);
+  --accent: oklch(0.33 0.01 152);
+  --accent-foreground: var(--foreground);
+  --hairline: oklch(0.78 0.01 150 / 14%);
+  --hairline-strong: oklch(0.78 0.01 150 / 22%);
+  --border: oklch(0.78 0.01 150 / 14%);
+  --input: oklch(0.78 0.01 150 / 18%);
+  --ring: oklch(0.69 0.014 152);
+  --brand: oklch(0.627 0.118 150);
+  --brand-muted: oklch(0.3 0.02 150);
+  --brand-subtle: oklch(0.28 0.015 150);
+  --chart-1: oklch(0.82 0.005 146);
+  --sidebar: oklch(0.281 0.012 150);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: oklch(0.627 0.118 150);
+  --sidebar-primary-foreground: oklch(0.17 0.02 150);
+  --sidebar-accent: oklch(0.33 0.01 152);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: oklch(0.78 0.01 150 / 14%);
+  --sidebar-ring: oklch(0.69 0.014 152);
+}
+
+/* ==========================================================================
+   阅读字号 (data-font-size): 对齐 Qoder — 只作用于会话正文与输入框,
+   不缩放 UI chrome (Qoder 的全局缩放是另一个独立设置).
+   档位 (Qoder 实测): 正文 小13/中14/大16, 行高 24/24/28, 行内 code/pre 12/13/14.
+   三档都写属性 (含 medium), 消费选择器统一带 html[data-font-size] 前缀,
+   优先级压过 stream-markdown 自带 utility 类与 text-sm, 无需 !important.
+   ========================================================================== */
+html[data-font-size='small'] {
+  --reading-size: 13px;
+  --reading-lh: 24px;
+  --reading-code-size: 12px;
+}
+
+html[data-font-size='medium'] {
+  --reading-size: 14px;
+  --reading-lh: 24px;
+  --reading-code-size: 13px;
+}
+
+html[data-font-size='large'] {
+  --reading-size: 16px;
+  --reading-lh: 28px;
+  --reading-code-size: 14px;
+}
+
+/* 会话正文 (.stream-markdown 根不设字号时继承 MessageContent text-sm=14px,
+   即 medium 档天然回落一致; p/li 等子元素均继承根字号随档缩放),
+   输入框 control 与占位文案同步换档 (主/side/编辑态 composer 共用标记). */
+html[data-font-size] [data-conversation-content] .stream-markdown,
+html[data-font-size] [data-chat-composer] [data-slot='input-group-control'],
+html[data-font-size] [data-chat-composer-placeholder] {
+  font-size: var(--reading-size);
+  line-height: var(--reading-lh);
+}
+
+html[data-font-size] [data-conversation-content] .stream-markdown :is(code, pre) {
+  font-size: var(--reading-code-size);
+}
+
+/* 正文字体 (data-reading-font): 衬线档只作用于会话正文 markdown,
+   UI chrome 不跟随; 代码类元素 (code/pre/kbd/samp) 保持等宽. */
+html[data-reading-font='serif'] [data-conversation-content] .stream-markdown {
+  font-family: var(--font-serif);
+}
+
+html[data-reading-font='serif'] [data-conversation-content] .stream-markdown :is(code, pre, kbd, samp) {
+  font-family: var(--font-mono);
+}
+
+/* 会话代码块 (仅浅色): 去描边改 muted 灰填充 (Qoder 式); 库 CSS 随异步 chunk
+   注入顺序不定, 用 html 前缀提权; 浅色下 shiki pre 无背景 (bg 只落 data-bg), 透出容器填充. */
+html:not(.dark) .stream-markdown [data-stream-markdown='code-block'] {
+  border-color: transparent;
+  background-color: var(--muted);
+}
+
+html:not(.dark) .stream-markdown [data-stream-markdown='code-block-header'] {
+  border-color: transparent;
+  background-color: transparent;
+}
+
+@layer base {
+  * {
+    @apply border-hairline outline-ring/50;
+  }
+  html {
+    /* 桌面壳永不滚动文档: 杜绝 Windows 经典滚动条闪现一帧挤压流内内容区
+       (侧栏 fixed 不动, 只有 flex-1 内容区被挤; macOS overlay 滚动条无此问题).
+       所有滚动都发生在内部容器 (消息列表/侧栏列表/设置页), 文档级滚动不存在. */
+    overflow: hidden;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    margin: 0;
+  }
+  /* lucide 图标统一描边: 上游默认 2 在 13px 正文字号体系下偏粗, 收敛到 1.75 */
+  .lucide {
+    stroke-width: 1.75;
+  }
+}
+
+/* ==========================================================================
+   全局滚动条美化
+   - 使用原生滚动条，覆盖所有 overflow-auto/scroll 区域
+   - 同时兼容 Webkit（Chrome/Safari/Edge）和 Firefox
+   - 颜色跟随主题变量，自动适配 light / dark
+   ========================================================================== */
+* {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* Webkit 系浏览器 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--muted-foreground);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* 不显示滚动条按钮（上下/左右箭头） */
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* ==========================================================================
+   reka-ui Collapsible 展开/收起高度过渡 (工具卡、终端卡等)
+   - 依赖 reka Presence 在动画结束前保持挂载
+   - 高度取自组件注入的 --reka-collapsible-content-height
+   ========================================================================== */
+[data-slot='collapsible-content'] {
+  overflow: hidden;
+}
+
+[data-slot='collapsible-content'][data-state='open'] {
+  animation: collapsible-down var(--motion-normal) ease-out;
+}
+
+[data-slot='collapsible-content'][data-state='closed'] {
+  animation: collapsible-up var(--motion-normal) ease-out;
+}
+
+@keyframes collapsible-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--reka-collapsible-content-height);
+  }
+}
+
+@keyframes collapsible-up {
+  from {
+    height: var(--reka-collapsible-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='collapsible-content'][data-state] {
+    animation: none;
+  }
+
+  /* 主题切换过渡: 减少动效时禁用 */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* 主题切换过渡: View Transitions API, 旧页面淡出 + 新页面淡入 (流效果) */
+::view-transition-old(root) {
+  animation: theme-fade-out 400ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  /* 覆盖默认 blend 模式, 避免切换瞬间颜色异常 (闪白/变暗) */
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: theme-fade-in 400ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  mix-blend-mode: normal;
+}
+
+@keyframes theme-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes theme-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.5%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
