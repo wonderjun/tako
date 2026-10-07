@@ -30,7 +30,7 @@
             size="icon-xs"
             :aria-label="pinned ? '取消钉住' : '钉住'"
             :title="pinned ? '取消钉住' : '钉住'"
-            @click="pinned = !pinned"
+            @click="togglePin"
           >
             <Pin :size="14" :class="pinned ? 'fill-current' : ''" />
           </Button>
@@ -60,14 +60,15 @@ import { useTranslateStore } from '@/features/translate/store';
 /**
  * popup 浮窗：紧凑结果面板（透明窗口内的卡片）。
  * 监听 selection:captured（划词取词完成）→ 填入文本并自动多开翻译；
- * 钉住/关闭仅 UI 态，真实窗口控制后续由主线接 wails API。
+ * 钉住经 bridge.setWindowPinned 落 Go 侧 pin 态（失焦不隐藏），
+ * 关闭经 bridge.hideWindow 真隐藏窗口。
  */
 const store = useTranslateStore();
 
 /** 当前展示的服务子流. */
 const activeServiceId = ref('');
 
-/** 钉住态（仅 UI 视觉，窗口置顶控制权后续接 wails API）. */
+/** 钉住态（UI 即时反馈，失败回滚）. */
 const pinned = ref(false);
 
 /** selection:captured 订阅的取消函数. */
@@ -108,9 +109,28 @@ async function copyResult(): Promise<void> {
   }
 }
 
-/** 关闭：仅 UI 态清理（窗口隐藏后续由主线接 wails API）. */
-function onClose(): void {
+/** 钉住/松开浮窗（置位 Go 侧 pin，失焦隐藏监听据此放行）. */
+async function togglePin(): Promise<void> {
+  const next = !pinned.value;
+  pinned.value = next;
+  try {
+    const bridge = await desktop();
+    await bridge.setWindowPinned('popup', next);
+  } catch {
+    pinned.value = !next;
+    toast.error('窗口钉住失败');
+  }
+}
+
+/** 关闭：真实隐藏窗口并清 UI 态. */
+async function onClose(): Promise<void> {
   store.reset();
   activeServiceId.value = '';
+  try {
+    const bridge = await desktop();
+    await bridge.hideWindow('popup');
+  } catch {
+    toast.error('关闭失败');
+  }
 }
 </script>

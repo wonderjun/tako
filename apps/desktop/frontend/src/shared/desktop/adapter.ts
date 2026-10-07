@@ -82,6 +82,8 @@ async function createWailsBridge(): Promise<DesktopBridge> {
     checkAccessibility: () => svc.CheckAccessibility() as never,
     openAccessibilitySettings: () => svc.OpenAccessibilitySettings() as never,
     licenseInfo: () => svc.LicenseInfo() as never,
+    setWindowPinned: (name, pinned) => svc.SetWindowPinned(name, pinned) as never,
+    hideWindow: (name) => svc.HideWindow(name) as never,
     onTranslateEvent: (cb) => bridgeEvents.on('translateEvent', cb),
     onSelectionCaptured: (cb) => bridgeEvents.on('selectionCaptured', cb),
     onHotkeyTriggered: (cb) => bridgeEvents.on('hotkeyTriggered', cb),

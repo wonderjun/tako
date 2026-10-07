@@ -11,6 +11,8 @@ import (
 	"tako/internal/license"
 	"tako/internal/provider"
 	"tako/internal/store"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 // fakeProvider 脚本化 provider（按 serviceID 之外的静态脚本跑）。
@@ -63,9 +65,30 @@ func newTestService(t *testing.T, factories map[string]providerFactory) (*Servic
 		factories: factories,
 		verifier:  license.FreeVerifier{},
 		active:    map[string]context.CancelFunc{},
+		pinned:    map[string]bool{},
+		windows:   fakeWindows,
 		emit:      col.emit,
 	}
 	return s, st, col
+}
+
+// fakeWindow 最小窗口句柄（仅记录 Hide 调用）。
+type fakeWindow struct{ hidden bool }
+
+func (f *fakeWindow) Hide() application.Window { f.hidden = true; return nil }
+
+// fakeWindows 固定窗口表：input/popup 存在，其余 miss。
+var fakeWindowRefs = map[string]*fakeWindow{
+	"input": {},
+	"popup": {},
+}
+
+func fakeWindows(name string) (windowRef, bool) {
+	w, ok := fakeWindowRefs[name]
+	if !ok {
+		return nil, false
+	}
+	return w, true
 }
 
 // okFactory 返回总是成功的假 provider（start→delta→finish 序列）。
@@ -350,5 +373,42 @@ func TestLicenseInfo(t *testing.T) {
 	li := s.LicenseInfo()
 	if !li.Licensed || li.Plan != "free" {
 		t.Fatalf("license=%+v", li)
+	}
+}
+
+func TestWindowPinned(t *testing.T) {
+	s, _, _ := newTestService(t, nil)
+	if s.IsPinned("input") {
+		t.Fatal("默认不应钉住")
+	}
+	if err := s.SetWindowPinned("input", true); err != nil {
+		t.Fatalf("pin: %v", err)
+	}
+	if !s.IsPinned("input") {
+		t.Fatal("pin 后 IsPinned 应为 true")
+	}
+	if err := s.SetWindowPinned("input", false); err != nil {
+		t.Fatalf("unpin: %v", err)
+	}
+	if s.IsPinned("input") {
+		t.Fatal("unpin 后 IsPinned 应为 false")
+	}
+	// 未登记窗口名报错
+	if err := s.SetWindowPinned("nope", true); err == nil {
+		t.Fatal("未知窗口应报错")
+	}
+}
+
+func TestHideWindow(t *testing.T) {
+	s, _, _ := newTestService(t, nil)
+	fakeWindowRefs["popup"].hidden = false
+	if err := s.HideWindow("popup"); err != nil {
+		t.Fatalf("hide: %v", err)
+	}
+	if !fakeWindowRefs["popup"].hidden {
+		t.Fatal("窗口应已隐藏")
+	}
+	if err := s.HideWindow("nope"); err == nil {
+		t.Fatal("未知窗口应报错")
 	}
 }

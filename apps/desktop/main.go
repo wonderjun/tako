@@ -18,11 +18,13 @@ import (
 var assets embed.FS
 
 func main() {
+	bridgeSvc := bridge.NewService()
+
 	app := application.New(application.Options{
 		Name:        "Tako",
 		Description: "多触手聚合翻译：划词即译，即用即走",
 		Services: []application.Service{
-			application.NewService(bridge.NewService()),
+			application.NewService(bridgeSvc),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
@@ -58,27 +60,37 @@ func main() {
 
 	// 浮窗：划词/截图翻译结果展示。frameless + 透明背景 + 失焦自动隐藏，
 	// 由 selection 取词完成后经 selection:captured 事件唤起（M4 接入）。
-	app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Name:            "popup",
-		Width:           420,
-		Height:          300,
-		URL:             "/#/popup",
-		Frameless:       true,
-		Hidden:          true,
-		AlwaysOnTop:     true,
-		HideOnFocusLost: true,
-		BackgroundType:  application.BackgroundTypeTransparent,
+	// 不用 HideOnFocusLost 选项（注册后不可摘除），改自注册失焦监听，
+	// 前端「钉住」经 SetWindowPinned 置位后失焦不隐藏。
+	popupWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
+		Name:           "popup",
+		Width:          420,
+		Height:         300,
+		URL:            "/#/popup",
+		Frameless:      true,
+		Hidden:         true,
+		AlwaysOnTop:    true,
+		BackgroundType: application.BackgroundTypeTransparent,
+	})
+	popupWindow.OnWindowEvent(events.Common.WindowLostFocus, func(*application.WindowEvent) {
+		if !bridgeSvc.IsPinned("popup") {
+			popupWindow.Hide()
+		}
 	})
 
-	// 输入窗：⌥A / 托盘菜单唤起的快捷输入翻译。
+	// 输入窗：⌥A / 托盘菜单唤起的快捷输入翻译。失焦隐藏同 popup 走 pin gate。
 	inputWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Name:            "input",
-		Width:           560,
-		Height:          420,
-		URL:             "/#/input",
-		Hidden:          true,
-		AlwaysOnTop:     true,
-		HideOnFocusLost: true,
+		Name:        "input",
+		Width:       560,
+		Height:      420,
+		URL:         "/#/input",
+		Hidden:      true,
+		AlwaysOnTop: true,
+	})
+	inputWindow.OnWindowEvent(events.Common.WindowLostFocus, func(*application.WindowEvent) {
+		if !bridgeSvc.IsPinned("input") {
+			inputWindow.Hide()
+		}
 	})
 
 	// 关闭主窗口 = 隐藏到托盘（退出走托盘菜单）。

@@ -184,6 +184,14 @@ export function createMockBridge(events: Emitter<MockBridgeEvents>): Bridge {
     async licenseInfo() {
       return { licensed: true, plan: 'free' as const };
     },
+
+    async setWindowPinned() {
+      /* mock：无窗口系统，钉住态仅前端 UI 可见 */
+    },
+
+    async hideWindow() {
+      /* mock：无窗口可隐 */
+    },
   };
 }
 

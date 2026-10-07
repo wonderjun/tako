@@ -210,6 +210,8 @@ export const BridgeMethods = {
   checkAccessibility: 'CheckAccessibility',
   openAccessibilitySettings: 'OpenAccessibilitySettings',
   licenseInfo: 'LicenseInfo',
+  setWindowPinned: 'SetWindowPinned',
+  hideWindow: 'HideWindow',
 } as const
 
 /** Go → 前端事件名（Wails application events） */
@@ -247,4 +249,12 @@ export interface Bridge {
   checkAccessibility(): Promise<boolean>
   openAccessibilitySettings(): Promise<void>
   licenseInfo(): Promise<LicenseInfo>
+  /**
+   * 钉住窗口：pinned 后失焦不自动隐藏（对 input/popup 这类
+   * 失焦即隐窗才有意义；main 不失焦隐藏，调用无副作用）。
+   * windowName 为 main.go 注册的窗口名（'input' | 'popup'）。
+   */
+  setWindowPinned(windowName: string, pinned: boolean): Promise<void>
+  /** 隐藏窗口（popup 关闭按钮等）；窗口名不存在时报错 */
+  hideWindow(windowName: string): Promise<void>
 }

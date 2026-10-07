@@ -46,6 +46,20 @@ export function GetSettings(): $CancellablePromise<$models.AppSettings> {
 }
 
 /**
+ * HideWindow 隐藏窗口（popup 关闭按钮等）；窗口名不存在时报错。
+ */
+export function HideWindow(windowName: string): $CancellablePromise<void> {
+    return $Call.ByID(707382709, windowName);
+}
+
+/**
+ * IsPinned 读窗口钉住态（main.go 失焦隐藏监听使用；未登记恒 false）。
+ */
+export function IsPinned(windowName: string): $CancellablePromise<boolean> {
+    return $Call.ByID(4143697087, windowName);
+}
+
+/**
  * LicenseInfo 许可证状态（一期 FreeVerifier 恒 free）。
  */
 export function LicenseInfo(): $CancellablePromise<$models.LicenseInfo> {
@@ -84,6 +98,15 @@ export function SaveService(service: $models.ServiceSetting): $CancellablePromis
 
 export function SaveSettings(settings: $models.AppSettings): $CancellablePromise<void> {
     return $Call.ByID(2579042389, settings);
+}
+
+/**
+ * SetWindowPinned 钉住/松开窗口：钉住后失焦不自动隐藏（main.go 的
+ * WindowLostFocus 监听按 IsPinned gate）。窗口名须为已注册窗口
+ * （'input' | 'popup' 等），否则报错。pin 态为进程内瞬态，不持久化。
+ */
+export function SetWindowPinned(windowName: string, pinned: boolean): $CancellablePromise<void> {
+    return $Call.ByID(4219483493, windowName, pinned);
 }
 
 /**

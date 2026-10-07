@@ -31,6 +31,12 @@ const translateMaxRetries = 2
 // testServiceTimeout 连通性测试的超时上限。
 const testServiceTimeout = 20 * time.Second
 
+// windowRef 窗口句柄的最小消费面（仅 Hide）；生产实现为 application.Window，
+// 测试注入假句柄。
+type windowRef interface {
+	Hide() application.Window
+}
+
 // Service bridge 服务实例。
 type Service struct {
 	mu        sync.Mutex
@@ -38,6 +44,8 @@ type Service struct {
 	factories map[string]providerFactory
 	verifier  license.Verifier
 	active    map[string]context.CancelFunc // requestID → cancel
+	pinned    map[string]bool               // windowName → 钉住态（失焦不隐藏）
+	windows   func(name string) (windowRef, bool)
 	emit      emitFunc
 }
 
@@ -48,8 +56,24 @@ func NewService() *Service {
 		factories: defaultFactories(),
 		verifier:  license.FreeVerifier{},
 		active:    map[string]context.CancelFunc{},
+		pinned:    map[string]bool{},
+		windows:   wailsWindowByName,
 		emit:      wailsEmit,
 	}
+}
+
+// wailsWindowByName 生产窗口查找（wails 应用单例）；应用未初始化
+// （单测等场景）返回 miss。
+func wailsWindowByName(name string) (windowRef, bool) {
+	app := application.Get()
+	if app == nil {
+		return nil, false
+	}
+	w, ok := app.Window.GetByName(name)
+	if !ok {
+		return nil, false
+	}
+	return w, true
 }
 
 // wailsEmit 生产事件出口（wails 应用单例）。
@@ -533,6 +557,40 @@ func (s *Service) LicenseInfo() LicenseInfo {
 		out.ExpiresAt = info.ExpiresAt.UnixMilli()
 	}
 	return out
+}
+
+// ---------------------------------------------------------------------------
+// 窗口控制（钉住 / 隐藏）
+// ---------------------------------------------------------------------------
+
+// SetWindowPinned 钉住/松开窗口：钉住后失焦不自动隐藏（main.go 的
+// WindowLostFocus 监听按 IsPinned gate）。窗口名须为已注册窗口
+// （'input' | 'popup' 等），否则报错。pin 态为进程内瞬态，不持久化。
+func (s *Service) SetWindowPinned(windowName string, pinned bool) error {
+	if _, ok := s.windows(windowName); !ok {
+		return fmt.Errorf("bridge: 未知窗口 %q", windowName)
+	}
+	s.mu.Lock()
+	s.pinned[windowName] = pinned
+	s.mu.Unlock()
+	return nil
+}
+
+// IsPinned 读窗口钉住态（main.go 失焦隐藏监听使用；未登记恒 false）。
+func (s *Service) IsPinned(windowName string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.pinned[windowName]
+}
+
+// HideWindow 隐藏窗口（popup 关闭按钮等）；窗口名不存在时报错。
+func (s *Service) HideWindow(windowName string) error {
+	w, ok := s.windows(windowName)
+	if !ok {
+		return fmt.Errorf("bridge: 未知窗口 %q", windowName)
+	}
+	w.Hide()
+	return nil
 }
 
 // ---------------------------------------------------------------------------
