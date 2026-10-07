@@ -52,7 +52,9 @@ apps/desktop/bin/
 # 前端 (Vue 3 + Vite + TypeScript)
 # ─────────────────────────────────────────────
 apps/desktop/frontend/node_modules/
-apps/desktop/frontend/dist/
+# dist 产物忽略但保留 .gitkeep——//go:embed all:frontend/dist 要求目录非空（新克隆/CI）
+apps/desktop/frontend/dist/*
+!apps/desktop/frontend/dist/.gitkeep
 apps/desktop/frontend/.eslintcache
 apps/desktop/frontend/*.tsbuildinfo
 
