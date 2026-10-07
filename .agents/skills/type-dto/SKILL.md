@@ -50,7 +50,7 @@ export interface ImageGenGenerateRequest {
 
 规则：
 
-1. **文件头块注释必写后端来源**：对应的后端 schema 文件路径 + 序列化口径（"驼峰序列化"）+ 与 chat 共用表的差异说明。找不到来源的先去 llm-ref 查 schema 再落笔。
+1. **文件头块注释必写后端来源**：对应的后端 schema 文件路径 + 序列化口径（"驼峰序列化"）+ 与 chat 共用表的差异说明。找不到来源的先与主线确认 schema 再落笔。
 2. 字段 **camelCase 直映后端 JSON**，每个字段一条中文 JSDoc；可空写 `?: T | null`（后端可回 null 的字段必须带 `| null`，只有前端可不传的才省略 null）。
 3. **对象/DTO/props 用 `interface`；联合字面量、工具别名、常量表推导用 `type`**：
 

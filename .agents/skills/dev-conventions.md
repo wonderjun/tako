@@ -1,13 +1,13 @@
 # Tako 前端开发规范（技能索引）
 
-本套技能覆盖 tako 前端（Wails 3 webview + Vue 3 + TS + Tailwind v4）的**代码写法细节层**，目标只有一个：**任何模型/任何人照本套规范写代码，产出风格一致**。实现手段（方法论承袭 上游前端）：
+本套技能覆盖 tako 前端（Wails 3 webview + Vue 3 + TS + Tailwind v4）的**代码写法细节层**，目标只有一个：**任何模型/任何人照本套规范写代码，产出风格一致**。实现手段：
 
 1. **双轨必裁决**——多种写法并存处全部钦点唯一正典，旧写法登记反例表，新代码禁止。
 2. **正典骨架可照抄**——写新代码先找对应技能的「范本文件」读一遍再落笔。
 3. **反例指向真实文件**——长得像反例的存量代码是要改的债，不是可以模仿的先例。
 4. **自查清单收尾**——每个任务完成前对照清单自检。
 
-> 迁移注记：本套技能自 上游前端 迁移改写。feature-organization / code-style-guide / vue-component / api-query / pinia-store / composable / type-dto / testing 八份的正文方法论照旧生效；遇到文中残留的 flow 语境（路径、命令、组件名）时，以 tako 实际目录与命令为准。
+> 迁移注记：本套技能自上游前端规范迁移改写。feature-organization / code-style-guide / vue-component / api-query / pinia-store / composable / type-dto / testing 八份的正文方法论照旧生效；遇到文中残留的上游项目语境（路径、命令、组件名）时，以 tako 实际目录与命令为准。
 
 ## 技能索引
 

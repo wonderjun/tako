@@ -19,4 +19,8 @@ apps/desktop/frontend/.eslintcache
 *.exe
 *.test
 # ----- ↑ 以上为 ZCode 默认排除规则（自定义规则请写在本行下方，不会被同步/恢复改动）-----
-# 自定义：docs/spec 为分工 spec，体积小保留索引；无额外排除
+# 自定义：docs/spec 为分工 spec，体积小保留索引；agent 工作目录不索引
+.zcode/
+.devin/
+.cottontail-tmp/
+.task/

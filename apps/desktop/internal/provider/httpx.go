@@ -1,7 +1,5 @@
 // 共享 HTTP 基础设施：流式 client（无总时长上限 + 首包超时 + 空闲看门狗）
-// 与普通 client（有总时长上限，供传统翻译 API）。看门狗与错误归一化
-// 参考 llm-ref internal/infra/ai/llm/http_client.go，裁剪掉 env 覆盖
-// 与 zap 日志（本模块保持零日志依赖）。
+// 与普通 client（有总时长上限，供传统翻译 API）。本模块保持零日志依赖。
 package provider
 
 import (

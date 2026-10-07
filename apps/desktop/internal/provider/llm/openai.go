@@ -1,7 +1,6 @@
 // Package llm LLM 翻译适配器：OpenAI 兼容协议（chat/completions SSE）。
-// 参考 llm-ref internal/infra/ai/llm/openai_compatible.go 裁剪：只保留
-// chat_completions 单格式，去掉 responses/tools/reasoning/providerRaw 等
-// 翻译用不到的能力。
+// 只保留 chat_completions 单格式，不含 responses/tools/reasoning/providerRaw
+// 等翻译用不到的能力。
 package llm
 
 import (

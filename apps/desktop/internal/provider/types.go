@@ -2,8 +2,8 @@
 //
 // 本文件是 SPEC-A（A1）的实现起点：接口与事件类型在此定稿（对齐
 // packages/contracts/src/index.ts），实现方不得修改签名，只填充实现。
-// 设计参考 llm-ref internal/infra/ai/llm（回调式流、零产出才重试、
-// 截断防御），裁剪掉工具调用/reasoning/多模态等翻译用不到的能力。
+// 设计取向：回调式流、零产出才重试、截断防御；不含工具调用/reasoning/
+// 多模态等翻译用不到的能力。
 package provider
 
 import "context"

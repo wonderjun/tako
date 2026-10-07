@@ -1,7 +1,6 @@
 # SPEC-A · Go 后端（执行者：swe2 · 分支 feat/backend）
 
 > 开工前必读：仓库根 `AGENTS.md`、`packages/contracts/README.md`（契约与时序）、`apps/desktop/internal/provider/types.go`（**接口已定稿，不得改签名**）。
-> 参考物（不照抄，按需裁剪）：`~/llm-ref/internal/infra/ai/llm/`（先读其 README）。
 
 ## 边界与纪律
 
@@ -18,7 +17,7 @@
 | 文件 | 内容 |
 |---|---|
 | `errors.go` | `ErrorKind`（types.go 已定义 8 个 ErrorCode）→ 对应 HTTP/响应错误的分类函数 `Classify(err) ErrorCode`；瞬时错误判定（429/connect 可重试） |
-| `httpx.go` | 共享流式 `http.Client`：`Timeout=0` + `ResponseHeaderTimeout`（首包 300s）+ 空闲看门狗 ReadCloser（连续 300s 无数据断流）。参考 llm-ref `http_client.go`（~150 行，可近乎原样借鉴） |
+| `httpx.go` | 共享流式 `http.Client`：`Timeout=0` + `ResponseHeaderTimeout`（首包 300s）+ 空闲看门狗 ReadCloser（连续 300s 无数据断流）。约 150 行规模 |
 | `retry.go` | `StreamWithRetry(ctx, p Provider, req, emit, max=2)`：**零产出才重试**（已 emit delta 的流不重试，防重复文本）+ 指数退避 + emit `stream-retry` 事件 |
 | `llm/openai.go` | OpenAI 兼容适配器：`POST {baseUrl}/chat/completions`，SSE 主循环（`data: ` 行 + `[DONE]` 终态），**截断防御**：干净 EOF 未见终态标记 → 合成断流错误交给重试层。鉴权按 `authScheme`（bearer=Authorization: Bearer；x-api-key=x-api-key 头）；`customHeaders` 先写入、鉴权头最后覆盖（防伪造）。系统提示词模板：翻译到目标语言，只回译文 |
 
@@ -80,12 +79,12 @@ A1 ──> A2 ∥ A3 ──> A4 ──> A5
 
 B（前端）在 mock 上并行开发，你无需等待；I1 联调只依赖 A5+B3 两个最早完成点。
 
-## 参考文件精读清单（llm-ref llm，按优先级）
+## 实装要点清单（按优先级）
 
-1. `README.md`（装配链与不变量速查）
-2. `http_client.go`（看门狗+超时模型 → A1 httpx.go）
-3. `openai_compatible.go` + `openai_chat.go`（SSE 主循环 + chunk 解析 → A1 llm/openai.go）
-4. `errors.go`（ErrorKind 分类 → A1 errors.go）
-5. `retry.go`（零产出才重试 → A1 retry.go）
+1. 装配链与不变量：ServiceStartup 装配 → Provider 注册表 → 请求生命周期（见 A5）
+2. 流式 HTTP 客户端：看门狗 + 首包超时模型 → A1 httpx.go
+3. OpenAI 兼容 SSE 主循环 + chunk 解析 → A1 llm/openai.go
+4. ErrorKind 分类（瞬时/鉴权/限流归并）→ A1 errors.go
+5. 零产出才重试 → A1 retry.go
 
-明确不抄：Anthropic 适配器、Responses 子格式、工具调用、reasoning variant、ProviderCache、ConfigResolver、多模态。
+明确不做：Anthropic 适配器、Responses 子格式、工具调用、reasoning variant、ProviderCache、ConfigResolver、多模态。

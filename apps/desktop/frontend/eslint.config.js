@@ -7,7 +7,7 @@ import pluginBoundaries from 'eslint-plugin-boundaries';
 import parserVue from 'vue-eslint-parser';
 
 // ============================================================================
-// Tako 前端 lint 基线（改写自 上游前端 eslint.config.js）
+// Tako 前端 lint 基线（改写自上游前端 eslint 基线）
 // 裁剪：design-token 自定义插件、vuejs-accessibility、存量棘轮（新仓库零存量）。
 // 保留：boundaries 分层、token 色彩护栏、max-lines 体量门槛、wails 触点红线。
 // ============================================================================

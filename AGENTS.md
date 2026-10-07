@@ -11,7 +11,7 @@
 | 动桥接（contracts/bindings/adapter） | `.agents/skills/bridge/SKILL.md` |
 | 消费翻译流式事件 | `.agents/skills/provider-streaming/SKILL.md` |
 | 查类型/事件/schema 契约 | `packages/contracts/`（README + index.ts + schema.sql） |
-| 提交代码 | `upstream` 系 git-workflow 惯例：conventional commits |
+| 提交代码 | git-workflow 技能惯例：conventional commits |
 
 ## 技术栈
 
@@ -71,3 +71,10 @@ docs/spec/                # SPEC-A / SPEC-B 分工规格
 - UI 硬编码颜色禁止（eslint token 护栏），色值走 `src/app/style.css` token
 - 依赖一律 Bun，禁 npm/pnpm/yarn
 - 不复制 Bob 的任何素材（UI/文案/图标），功能对齐、资源原创
+
+## 公开仓库卫生（违者返工）
+
+- 不提交个人路径（`/Users/xxx`、`/home/xxx`）、真实凭据、真实设备使用数据；示例路径一律用 `~/` 或 `/path/to/` 占位
+- 演示/截图数据只用 mock 与种子数据，不截真实账号内容
+- 测试 key 必须明显为假（`sk-test`、`xxx` 形态），禁止出现真实形态的密钥字符串
+- agent 本机工作目录（`.devin/`、`.zcode/`、`.task/` 等）走目录级 `.gitignore`，不入库

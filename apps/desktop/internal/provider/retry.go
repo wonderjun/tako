@@ -1,7 +1,6 @@
 // 流式调用的自动重连：核心不变量是「零产出才重试」——tracked emit 见到
 // 任何非 stream-retry 事件即标记产出，已产出内容的失败原样上抛（防正文
-// 重复流出）。参考 llm-ref retry.go 裁剪（去掉 RetryExhaustedError，
-// 翻译场景重试预算小，上抛原始错误即可）。
+// 重复流出）。翻译场景重试预算小，上抛原始错误即可。
 package provider
 
 import (
